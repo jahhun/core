@@ -431,7 +431,7 @@ model Block {
   objectFit               VideoBlockObjectFit?
   triggerStart            Int?
   projectId               String?
-  apiToken                String?
+  apiToken                String? /// @encrypted
   formSlug                String?
   updatedAt               DateTime             @default(now()) @updatedAt
   journey                 Journey              @relation(fields: [journeyId], references: [id], onDelete: Cascade)
