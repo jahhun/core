@@ -1,6 +1,7 @@
 type Resource @key(fields: "id") {
   id: ID!
   nexusId: String!
+  nexus: Nexus!
   name: String!
   googleDrive: GoogleDriveResource
   createdAt: DateTime!
@@ -18,7 +19,6 @@ type GoogleDriveResource @key(fields: "id") {
   resource: Resource!
   title: String!
   driveId: String!
-  mimeType: String!
   refreshToken: String!
 }
 
@@ -34,7 +34,7 @@ input ResourceUpdateInput {
 }
 
 input ResourceFromGoogleDriveInput {
-  fileIds: [String!]!
+  fileId: String!
   authCode: String!
   nexusId: String!
 }
@@ -61,5 +61,5 @@ extend type Mutation {
   resourceCreate(input: ResourceCreateInput!): Resource!
   resourceUpdate(id: ID!, input: ResourceUpdateInput!): Resource!
   resourceDelete(id: ID!): Boolean!
-  resourceFromGoogleDrive(input: ResourceFromGoogleDriveInput!): [Resource!]
+  resourceFromGoogleDrive(input: ResourceFromGoogleDriveInput!): Resource!
 }

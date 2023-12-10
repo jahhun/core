@@ -8,7 +8,17 @@
 /* tslint:disable */
 /* eslint-disable */
 
+export enum ChannelStatus {
+    deleted = "deleted",
+    published = "published"
+}
+
 export enum NexusStatus {
+    deleted = "deleted",
+    published = "published"
+}
+
+export enum ResourceStatus {
     deleted = "deleted",
     published = "published"
 }
@@ -70,7 +80,7 @@ export class ResourceUpdateInput {
 }
 
 export class ResourceFromGoogleDriveInput {
-    fileIds: string[];
+    fileId: string;
     authCode: string;
     nexusId: string;
 }
@@ -89,6 +99,20 @@ export class Channel {
     name: string;
     platform?: Nullable<string>;
     connected?: Nullable<boolean>;
+    youtube?: Nullable<ChannelYoutube>;
+    status: ChannelStatus;
+}
+
+export class ChannelYoutube {
+    __typename?: 'ChannelYoutube';
+    id: string;
+    channelId?: Nullable<string>;
+    channel?: Nullable<Channel>;
+    title?: Nullable<string>;
+    description?: Nullable<string>;
+    youtubeId?: Nullable<string>;
+    imageUrl?: Nullable<string>;
+    refreshToken?: Nullable<string>;
 }
 
 export abstract class IQuery {
@@ -121,6 +145,7 @@ export class Resource {
     __typename?: 'Resource';
     id: string;
     nexusId: string;
+    nexus: Nexus;
     name: string;
     googleDrive?: Nullable<GoogleDriveResource>;
     createdAt: DateTime;
@@ -134,7 +159,6 @@ export class GoogleDriveResource {
     resource: Resource;
     title: string;
     driveId: string;
-    mimeType: string;
     refreshToken: string;
 }
 
@@ -158,7 +182,7 @@ export abstract class IMutation {
 
     abstract nexusUpdate(id: string, input: NexusUpdateInput): Nexus | Promise<Nexus>;
 
-    abstract nexusDelete(id: string): Nexus | Promise<Nexus>;
+    abstract nexusDelete(id: string): boolean | Promise<boolean>;
 
     abstract resourceCreate(input: ResourceCreateInput): Resource | Promise<Resource>;
 
@@ -166,7 +190,7 @@ export abstract class IMutation {
 
     abstract resourceDelete(id: string): boolean | Promise<boolean>;
 
-    abstract resourceFromGoogleDrive(input: ResourceFromGoogleDriveInput): Nullable<Resource[]> | Promise<Nullable<Resource[]>>;
+    abstract resourceFromGoogleDrive(input: ResourceFromGoogleDriveInput): Resource | Promise<Resource>;
 }
 
 export class Language {
