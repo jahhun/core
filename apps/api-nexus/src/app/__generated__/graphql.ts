@@ -67,8 +67,12 @@ export class ResourceCreateInput {
 
 export class ResourceUpdateInput {
     name?: Nullable<string>;
-    refLink?: Nullable<string>;
-    videoId?: Nullable<string>;
+}
+
+export class ResourceFromGoogleDriveInput {
+    fileIds: string[];
+    authCode: string;
+    nexusId: string;
 }
 
 export class ResourceFilter {
@@ -118,8 +122,20 @@ export class Resource {
     id: string;
     nexusId: string;
     name: string;
-    refLink?: Nullable<string>;
-    videoId?: Nullable<string>;
+    googleDrive?: Nullable<GoogleDriveResource>;
+    createdAt: DateTime;
+    status: ResourceStatus;
+}
+
+export class GoogleDriveResource {
+    __typename?: 'GoogleDriveResource';
+    id: string;
+    resourceId: string;
+    resource: Resource;
+    title: string;
+    driveId: string;
+    mimeType: string;
+    refreshToken: string;
 }
 
 export class Translation {
@@ -148,7 +164,9 @@ export abstract class IMutation {
 
     abstract resourceUpdate(id: string, input: ResourceUpdateInput): Resource | Promise<Resource>;
 
-    abstract resourceDelete(id: string): Resource | Promise<Resource>;
+    abstract resourceDelete(id: string): boolean | Promise<boolean>;
+
+    abstract resourceFromGoogleDrive(input: ResourceFromGoogleDriveInput): Nullable<Resource[]> | Promise<Nullable<Resource[]>>;
 }
 
 export class Language {
