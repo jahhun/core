@@ -19,6 +19,7 @@ type GoogleDriveResource @key(fields: "id") {
   resource: Resource!
   title: String!
   driveId: String!
+  mimeType: String!
   refreshToken: String!
   cloudFlareId: String
 }
@@ -77,7 +78,7 @@ input ResourceUpdateInput {
 }
 
 input ResourceFromGoogleDriveInput {
-  fileId: String!
+  fileIds: [String!]!
   authCode: String!
   nexusId: String!
 }
@@ -105,5 +106,5 @@ extend type Mutation {
   resourceCreate(input: ResourceCreateInput!): Resource!
   resourceUpdate(id: ID!, input: ResourceUpdateInput!): Resource!
   resourceDelete(id: ID!): Resource!
-  resourceFromGoogleDrive(input: ResourceFromGoogleDriveInput!): Resource!
+  resourceFromGoogleDrive(input: ResourceFromGoogleDriveInput!): [Resource!]
 }

@@ -80,7 +80,7 @@ export class ResourceUpdateInput {
 }
 
 export class ResourceFromGoogleDriveInput {
-    fileId: string;
+    fileIds: string[];
     authCode: string;
     nexusId: string;
 }
@@ -165,6 +165,7 @@ export class GoogleDriveResource {
     resource: Resource;
     title: string;
     driveId: string;
+    mimeType: string;
     refreshToken: string;
 }
 
@@ -196,7 +197,7 @@ export abstract class IMutation {
 
     abstract resourceDelete(id: string): boolean | Promise<boolean>;
 
-    abstract resourceFromGoogleDrive(input: ResourceFromGoogleDriveInput): Resource | Promise<Resource>;
+    abstract resourceFromGoogleDrive(input: ResourceFromGoogleDriveInput): Nullable<Resource[]> | Promise<Nullable<Resource[]>>;
 }
 
 export class Language {
