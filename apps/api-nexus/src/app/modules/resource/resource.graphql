@@ -20,6 +20,49 @@ type GoogleDriveResource @key(fields: "id") {
   title: String!
   driveId: String!
   refreshToken: String!
+  cloudFlareId: String
+}
+
+type CloudflareRetrieveVideoDetailsResponse {
+  success: Boolean
+  errors: [ErrorType]
+  messages: [MessageType]
+  result: CloudflareRetrieveVideoDetailsResponseResult
+}
+
+type CloudflareRetrieveVideoDetailsResponseResult {
+  uid: String
+  size: Int
+  readyToStream: Boolean
+  thumbnail: String
+  duration: Float
+  preview: String
+  input: VideoInput
+  playback: VideoPlayback
+  meta: MetaType
+}
+
+type VideoInput {
+  width: Int
+  height: Int
+}
+
+type VideoPlayback {
+  hls: String
+}
+
+type MetaType {
+  [key: String]: String
+}
+
+type ErrorType {
+  code: Int
+  message: String
+}
+
+type MessageType {
+  code: Int
+  message: String
 }
 
 input ResourceCreateInput {
@@ -55,11 +98,12 @@ input AddResourceFromGoogleDriveInput {
 extend type Query {
   resources(where: ResourceFilter): [Resource!]
   resource(id: ID!): Resource!
+  videoDetailsOnCloudflare(videoId: String!): CloudflareRetrieveVideoDetailsResponse!
 }
 
 extend type Mutation {
   resourceCreate(input: ResourceCreateInput!): Resource!
   resourceUpdate(id: ID!, input: ResourceUpdateInput!): Resource!
-  resourceDelete(id: ID!): Boolean!
+  resourceDelete(id: ID!): Resource!
   resourceFromGoogleDrive(input: ResourceFromGoogleDriveInput!): Resource!
 }

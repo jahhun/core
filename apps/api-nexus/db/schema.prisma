@@ -76,4 +76,5 @@ model GoogleDriveResource {
     mimeType     String
     refreshToken String
     resource     Resource @relation(fields: [resourceId], references: [id])
+    cloudFlareId String?
 }

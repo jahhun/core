@@ -92,6 +92,12 @@ export class ResourceFilter {
     limit?: Nullable<number>;
 }
 
+export class AddResourceFromGoogleDriveInput {
+    accessToken: string;
+    fileId: string;
+    nexusId: string;
+}
+
 export class Channel {
     __typename?: 'Channel';
     id: string;

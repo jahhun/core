@@ -139,19 +139,126 @@ export class ResourceResolver {
         createdAt: new Date()
       }
     })
-    await this.prismaService.googleDriveResource.create({
+
+    const _googleDriveResource =
+      await this.prismaService.googleDriveResource.create({
+        data: {
+          id: uuidv4(),
+          resourceId: resource.id,
+          driveId: driveFile.id,
+          title: driveFile.name,
+          mimeType: driveFile.mimeType,
+          refreshToken: input.authCode ?? ''
+        }
+      })
+
+    const response = await uploadToCloudflareByUrl(
+      this.googleDriveService.getFileUrl(input.fileId ?? ''),
+      userId
+    )
+
+    if (!response.success || response.result == null)
+      throw new Error(response.errors[0])
+
+    await this.prismaService.googleDriveResource.update({
+      where: {
+        id: _googleDriveResource.id
+      },
       data: {
-        id: uuidv4(),
-        resourceId: resource.id,
-        driveId: driveFile.id,
-        title: driveFile.name,
-        mimeType: driveFile.mimeType,
-        refreshToken: input.authCode ?? ''
+        cloudFlareId: response.result.uid
       }
     })
+
     return await this.prismaService.resource.findFirst({
       where: { id: resource.id },
       include: { googleDrive: true }
     })
   }
+
+  @Query()
+  async videoDetailsOnCloudflare(
+    @Args('input') videoId: string
+  ): Promise<CloudflareRetrieveVideoDetailsResponse> {
+    return await fetchVideoDetailsFromCloudflare(videoId)
+  }
+}
+
+interface CloudflareVideoUrlUploadResponse {
+  result: {
+    uid: string
+  } | null
+  success: boolean
+  errors: string[]
+  messages: string[]
+}
+
+async function uploadToCloudflareByUrl(
+  url: string,
+  userId: string
+): Promise<CloudflareVideoUrlUploadResponse> {
+  const response = await fetch(
+    `https://api.cloudflare.com/client/v4/accounts/${
+      process.env.CLOUDFLARE_ACCOUNT_ID ?? ''
+    }/stream/copy`,
+    {
+      method: 'POST',
+      headers: {
+        Authorization: `Bearer ${process.env.CLOUDFLARE_STREAM_TOKEN ?? ''}`,
+        'Content-Type': 'application/json'
+      },
+      body: JSON.stringify({ url, creator: userId })
+    }
+  )
+  return await response.json()
+}
+
+interface CloudflareRetrieveVideoDetailsResponse {
+  result: CloudflareRetrieveVideoDetailsResponseResult | null
+  success: boolean
+  errors: Array<{ code: number; message: string }>
+  messages: Array<{ code: number; message: string }>
+}
+
+interface CloudflareRetrieveVideoDetailsResponseResult {
+  uid: string
+  size: number
+  readyToStream: boolean
+  thumbnail: string
+  duration: number
+  preview: string
+  input: {
+    width: number
+    height: number
+  }
+  playback: {
+    hls: string
+  }
+  meta: {
+    [key: string]: string
+  }
+}
+
+async function fetchVideoDetailsFromCloudflare(
+  videoId: string
+): Promise<CloudflareRetrieveVideoDetailsResponse> {
+  const response = await (
+    await fetch(
+      `https://api.cloudflare.com/client/v4/accounts/${
+        process.env.CLOUDFLARE_ACCOUNT_ID ?? ''
+      }/stream/${videoId}`,
+      {
+        headers: {
+          Authorization: `Bearer ${process.env.CLOUDFLARE_STREAM_TOKEN ?? ''}`
+        }
+      }
+    )
+  ).json()
+
+  if (response.result == null) {
+    throw new GraphQLError('videoId cannot be found on Cloudflare', {
+      extensions: { code: 'NOT_FOUND' }
+    })
+  }
+
+  return response
 }

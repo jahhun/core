@@ -29,4 +29,8 @@ export class GoogleDriveService {
 
     return await response.json()
   }
+
+  getFileUrl(fileId: string): string {
+    return `${this.rootUrl}/files/${fileId}`
+  }
 }
