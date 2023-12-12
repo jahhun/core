@@ -121,6 +121,7 @@ export class ResourceResolver {
       throw new GraphQLError('nexus not found', {
         extensions: { code: 'NOT_FOUND' }
       })
+    // eslint-disable-next-line @typescript-eslint/no-misused-promises
     await input.fileIds.forEach(async (fileId) => {
       const driveFile = await this.googleDriveService.getFile({
         fileId,
@@ -141,25 +142,26 @@ export class ResourceResolver {
         }
       })
 
-      const _googleDriveResource = await this.prismaService.googleDriveResource.create({
-        data: {
-          id: uuidv4(),
-          resourceId: resource.id,
-          driveId: driveFile.id,
-          title: driveFile.name,
-          mimeType: driveFile.mimeType,
-          refreshToken: input.authCode ?? ''
-        }
-      })
+      const _googleDriveResource =
+        await this.prismaService.googleDriveResource.create({
+          data: {
+            id: uuidv4(),
+            resourceId: resource.id,
+            driveId: driveFile.id,
+            title: driveFile.name,
+            mimeType: driveFile.mimeType,
+            refreshToken: input.authCode ?? ''
+          }
+        })
 
       const response = await uploadToCloudflareByUrl(
         this.googleDriveService.getFileUrl(fileId),
         userId
       )
-  
+
       if (!response.success || response.result == null)
         throw new Error(response.errors[0])
-  
+
       await this.prismaService.googleDriveResource.update({
         where: {
           id: _googleDriveResource.id
