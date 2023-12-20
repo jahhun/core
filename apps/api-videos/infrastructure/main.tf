@@ -17,7 +17,7 @@ module "seed" {
     "DATABASE_PASS",
     "DATABASE_URL",
     "DATABASE_USER",
-    "PG_DATABASE_URL"
+    "PG_DATABASE_URL_VIDEOS"
   ]
   cpu                     = 1024
   memory                  = 4096

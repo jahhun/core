@@ -2,7 +2,7 @@ locals {
   port = 4001
   environment_variables = [
     "FIREBASE_API_KEY",
-    "PG_DATABASE_URL",
+    "PG_DATABASE_URL_JOURNEYS",
     "POWER_BI_CLIENT_ID",
     "POWER_BI_CLIENT_SECRET",
     "POWER_BI_JOURNEYS_MULTIPLE_FULL_REPORT_ID",
