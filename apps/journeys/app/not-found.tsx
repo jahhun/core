@@ -17,7 +17,7 @@ import {
 } from '../__generated__/globalTypes'
 import { Conductor } from '../src/components/Conductor'
 
-export function Custom404(): ReactElement {
+export default function NotFoundPage(): ReactElement {
   const { t } = useTranslation('apps-journeys')
   const blocks: Block[] = [
     {
@@ -105,5 +105,3 @@ export function Custom404(): ReactElement {
     </ThemeProvider>
   )
 }
-
-export default Custom404

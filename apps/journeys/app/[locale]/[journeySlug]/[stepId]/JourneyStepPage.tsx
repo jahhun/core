@@ -8,9 +8,15 @@ import { BlockRenderer } from '@core/journeys/ui/BlockRenderer'
 import { transformer } from '@core/journeys/ui/transformer'
 import { ThemeProvider } from '@core/shared/ui/ThemeProvider'
 
+import { GetJourney_journey as Journey } from '../../../../__generated__/GetJourney'
 import { VideoWrapperPaused as VideoWrapper } from '../../../../src/components/VideoWrapperPaused'
 
-import { JourneyStepPageProps } from './shared'
+export interface JourneyStepPageProps {
+  journey: Journey
+  locale: string
+  rtl: boolean
+  stepId: string | string[] | undefined
+}
 
 export default function JourneyStepPage({
   journey,
@@ -18,7 +24,7 @@ export default function JourneyStepPage({
   rtl,
   stepId
 }: JourneyStepPageProps): ReactElement {
-  const blocks: TreeBlock[] = transformer(journey.blocks)
+  const blocks: TreeBlock[] = transformer(journey.blocks ?? [])
   const currentStep: TreeBlock | undefined = blocks.find(
     (block) => block.id === stepId
   )

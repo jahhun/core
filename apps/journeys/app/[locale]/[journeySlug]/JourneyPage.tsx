@@ -7,9 +7,14 @@ import { JourneyProvider } from '@core/journeys/ui/JourneyProvider'
 import { transformer } from '@core/journeys/ui/transformer'
 import { ThemeProvider } from '@core/shared/ui/ThemeProvider'
 
+import { GetJourney_journey as Journey } from '../../../__generated__/GetJourney'
 import { Conductor } from '../../../src/components/Conductor'
 
-import { JourneyPageProps } from './shared'
+export interface JourneyPageProps {
+  journey: Journey
+  locale: string
+  rtl: boolean
+}
 
 export default function JourneyPage({
   journey,

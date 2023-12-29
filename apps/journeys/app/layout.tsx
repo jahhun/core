@@ -23,6 +23,7 @@ export default function RootLayout({
   children: ReactNode
   theme: Theme
 }) {
+  const { rtl, locale } = getJourneyRTL(pageProps)
   return (
     <html lang="en" dir={rtl ? 'rtl' : ''}>
       <head>
@@ -135,8 +136,6 @@ MyDocument.getInitialProps = async (ctx) => {
       dangerouslySetInnerHTML={{ __html: style.css }}
     />
   ))
-
-  const { rtl, locale } = getJourneyRTL(pageProps)
 
   return {
     ...initialProps,
