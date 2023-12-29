@@ -24,7 +24,10 @@ export async function generateStaticParams(): Promise<
   const { data } = await apolloClient.query<GetJourneySlugs>({
     query: GET_JOURNEY_SLUGS
   })
-  return data.journeys.map(({ slug }) => ({ journeySlug: slug }))
+  return data.journeys.map(({ slug, language }) => ({
+    journeySlug: slug,
+    locale: language.bcp47 ?? 'en'
+  }))
 }
 
 export default async function Page({

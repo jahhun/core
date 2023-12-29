@@ -6,6 +6,9 @@ export const GET_JOURNEY_SLUGS = gql`
   query GetJourneySlugs {
     journeys {
       slug
+      language {
+        bcp47
+      }
     }
   }
 `
@@ -15,6 +18,16 @@ export const GET_JOURNEY = gql`
   query GetJourney($id: ID!) {
     journey(id: $id, idType: slug) {
       ...JourneyFields
+    }
+  }
+`
+
+export const GET_JOURNEYS = gql`
+  query GetJourneys {
+    journeys(where: { featured: true, template: false }) {
+      id
+      title
+      slug
     }
   }
 `

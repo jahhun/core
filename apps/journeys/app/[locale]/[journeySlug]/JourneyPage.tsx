@@ -26,6 +26,7 @@ export default function JourneyPage({
   if (isIframe) {
     void router.push('/embed/[journeySlug]', `/embed/${journey.slug}`)
   }
+
   return (
     <>
       <head>

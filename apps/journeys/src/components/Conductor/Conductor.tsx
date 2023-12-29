@@ -1,3 +1,5 @@
+'use client'
+
 import { gql, useMutation } from '@apollo/client'
 import Box from '@mui/material/Box'
 import Fade from '@mui/material/Fade'
