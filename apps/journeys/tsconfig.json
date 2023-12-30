@@ -4,10 +4,7 @@
     "jsx": "preserve",
     "allowJs": true,
     "allowSyntheticDefaultImports": true,
-    "types": [
-      "node",
-      "jest"
-    ],
+    "types": ["node", "jest"],
     "strict": false,
     "forceConsistentCasingInFileNames": true,
     "noEmit": true,
@@ -27,13 +24,7 @@
     "**/*.js",
     "**/*.jsx",
     "next-env.d.ts",
-    "pages/embed/[journeySlug].tsx.bak",
-    "pages/embed/test/[journeySlug].tsx.bak",
-    "pages/[journeySlug]/[stepId].tsx.bak",
     "../../dist/apps/journeys/.next/types/**/*.ts"
   ],
-  "exclude": [
-    "node_modules",
-    "jest.config.ts"
-  ]
+  "exclude": ["node_modules", "jest.config.ts"]
 }

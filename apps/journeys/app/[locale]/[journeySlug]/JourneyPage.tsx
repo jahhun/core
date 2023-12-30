@@ -1,6 +1,6 @@
 'use client'
 
-import { useRouter } from 'next/router'
+import { useRouter } from 'next/navigation'
 import { ReactElement } from 'react'
 
 import { JourneyProvider } from '@core/journeys/ui/JourneyProvider'
@@ -24,7 +24,7 @@ export default function JourneyPage({
   const router = useRouter()
   const isIframe = typeof window !== 'undefined' && window.self !== window.top
   if (isIframe) {
-    void router.push('/embed/[journeySlug]', `/embed/${journey.slug}`)
+    void router.push(`/embed/[journeySlug]/embed/${journey.slug}`)
   }
 
   return (

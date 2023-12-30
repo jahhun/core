@@ -1,10 +1,12 @@
+'use client'
+
 import { ReactElement } from 'react'
 import { useTranslation } from 'react-i18next'
 
 import { transformer } from '@core/journeys/ui/transformer'
 import { ThemeProvider } from '@core/shared/ui/ThemeProvider'
 
-import { GetJourney_journey_blocks as Block } from '../__generated__/GetJourney'
+import { GetJourney_journey_blocks as Block } from '../../__generated__/GetJourney'
 import {
   ButtonColor,
   ButtonSize,
@@ -14,8 +16,8 @@ import {
   ThemeName,
   TypographyAlign,
   TypographyVariant
-} from '../__generated__/globalTypes'
-import { Conductor } from '../src/components/Conductor'
+} from '../../__generated__/globalTypes'
+import { Conductor } from '../../src/components/Conductor'
 
 export function Custom500(): ReactElement {
   const { t } = useTranslation('apps-journeys')

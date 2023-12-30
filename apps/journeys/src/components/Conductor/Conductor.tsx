@@ -5,7 +5,7 @@ import Box from '@mui/material/Box'
 import Fade from '@mui/material/Fade'
 import Stack from '@mui/material/Stack'
 import { SxProps, styled, useTheme } from '@mui/material/styles'
-import { useRouter } from 'next/router'
+import { useSearchParams } from 'next/navigation'
 import { ReactElement, useEffect, useState } from 'react'
 import { use100vh } from 'react-div-100vh'
 import TagManager from 'react-gtm-module'
@@ -78,7 +78,7 @@ export function Conductor({ blocks }: ConductorProps): ReactElement {
   const [swiper, setSwiper] = useState<SwiperClass>()
   const theme = useTheme()
   const viewportHeight = use100vh()
-  const router = useRouter()
+  const searchParams = useSearchParams()
   const { journey, variant } = useJourney()
   const { locale, rtl } = getJourneyRTL(journey)
   const activeBlock = blockHistory[
@@ -251,9 +251,10 @@ export function Conductor({ blocks }: ConductorProps): ReactElement {
                               px: { lg: 6 }
                             }}
                           >
-                            {showHeaderFooter && router.query.noi == null && (
-                              <StepHeader sx={{ ...mobileNotchStyling }} />
-                            )}
+                            {showHeaderFooter &&
+                              searchParams?.get('noi') == null && (
+                                <StepHeader sx={{ ...mobileNotchStyling }} />
+                              )}
                             <BlockRenderer block={block} />
                             <StepFooter
                               sx={{

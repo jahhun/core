@@ -1,43 +1,19 @@
 'use client'
 
-import { ApolloProvider } from '@apollo/client'
-import type { EmotionCache } from '@emotion/cache'
-import { CacheProvider } from '@emotion/react'
 import { getAuth, onAuthStateChanged } from 'firebase/auth'
-import { AppProps as NextJsAppProps } from 'next/app'
 import Head from 'next/head'
 import Script from 'next/script'
-import { SSRConfig, appWithTranslation } from 'next-i18next'
-import { DefaultSeo } from 'next-seo'
 import { SnackbarProvider } from 'notistack'
 import { ReactNode, useEffect } from 'react'
 import TagManager from 'react-gtm-module'
 import { useTranslation } from 'react-i18next'
 
-import { getJourneyRTL } from '@core/journeys/ui/rtl'
-import { createEmotionCache } from '@core/shared/ui/createEmotionCache'
-
-import { GetJourney_journey as Journey } from '../__generated__/GetJourney'
-import i18nConfig from '../next-i18next.config'
-import { useApollo } from '../src/libs/apolloClient'
-import { firebaseClient } from '../src/libs/firebaseClient'
+import { firebaseClient } from '../../src/libs/firebaseClient'
 
 import 'swiper/css'
 import 'swiper/css/pagination'
 
-// type JourneysAppProps = NextJsAppProps<{ journey?: Journey }> & {
-//   pageProps: SSRConfig
-//   emotionCache?: EmotionCache
-// }
-
-function JourneysApp({
-  children
-}: // emotionCache = createEmotionCache({
-//   rtl: getJourneyRTL(pageProps.journey).rtl
-// })
-{
-  children: ReactNode
-}): ReactNode {
+export default function JourneysApp({ children }): ReactNode {
   const { t } = useTranslation('apps-journeys')
   useEffect(() => {
     if (
@@ -60,14 +36,13 @@ function JourneysApp({
       }
     })
   }, [])
-  const apolloClient = useApollo()
 
   return (
-    <CacheProvider value={emotionCache}>
-      <DefaultSeo
+    <>
+      {/* <DefaultSeo
         titleTemplate={t('%s | Next Steps')}
         defaultTitle={t('Next Steps')}
-      />
+      /> */}
       <Head>
         <meta
           name="viewport"
@@ -108,18 +83,14 @@ function JourneysApp({
            `}
           </Script>
         )}
-      <ApolloProvider client={apolloClient}>
-        <SnackbarProvider
-          anchorOrigin={{
-            vertical: 'bottom',
-            horizontal: 'right'
-          }}
-        >
-          {children}
-        </SnackbarProvider>
-      </ApolloProvider>
-    </CacheProvider>
+      <SnackbarProvider
+        anchorOrigin={{
+          vertical: 'bottom',
+          horizontal: 'right'
+        }}
+      >
+        {children}
+      </SnackbarProvider>
+    </>
   )
 }
-
-export default appWithTranslation(JourneysApp, i18nConfig)

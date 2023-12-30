@@ -1,3 +1,5 @@
+'use client'
+
 import Box from '@mui/material/Box'
 import Container from '@mui/material/Container'
 import Fade from '@mui/material/Fade'
@@ -13,8 +15,8 @@ import { useTranslation } from 'react-i18next'
 
 import { ThemeProvider } from '@core/shared/ui/ThemeProvider'
 
-import { ThemeMode, ThemeName } from '../__generated__/globalTypes'
-import logo from '../public/logo.svg'
+import { ThemeMode, ThemeName } from '../../__generated__/globalTypes'
+import logo from '../../public/logo.svg'
 
 const StyledIframe = styled('iframe')(({ theme }) => ({}))
 

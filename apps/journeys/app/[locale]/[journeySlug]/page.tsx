@@ -1,16 +1,14 @@
 import { notFound } from 'next/navigation'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { ReactNode } from 'react'
 
 import { getJourneyRTL } from '@core/journeys/ui/rtl'
 
 import { GetJourney } from '../../../__generated__/GetJourney'
 import { GetJourneySlugs } from '../../../__generated__/GetJourneySlugs'
-import i18nConfig from '../../../next-i18next.config'
-import { createApolloClient } from '../../../src/libs/apolloClient'
-import { GET_JOURNEY, GET_JOURNEY_SLUGS } from '../../queries'
+import { GET_JOURNEY, GET_JOURNEY_SLUGS } from '../queries'
 
 import JourneyPage from './JourneyPage'
+import { getApolloClient } from '../../../src/libs/apolloClient/apolloClient'
 
 interface JourneyPageParams {
   journeySlug: string
@@ -20,8 +18,7 @@ interface JourneyPageParams {
 export async function generateStaticParams(): Promise<
   Array<{ journeySlug: string }>
 > {
-  const apolloClient = createApolloClient()
-  const { data } = await apolloClient.query<GetJourneySlugs>({
+  const { data } = await getApolloClient().query<GetJourneySlugs>({
     query: GET_JOURNEY_SLUGS
   })
   return data.journeys.map(({ slug, language }) => ({
@@ -35,9 +32,8 @@ export default async function Page({
 }: {
   params: JourneyPageParams
 }): Promise<ReactNode> {
-  const apolloClient = createApolloClient()
   try {
-    const { data } = await apolloClient.query<GetJourney>({
+    const { data } = await getApolloClient().query<GetJourney>({
       query: GET_JOURNEY,
       variables: {
         id: params.journeySlug
@@ -45,11 +41,6 @@ export default async function Page({
     })
     const { rtl, locale } = getJourneyRTL(data.journey)
     const props = {
-      ...(await serverSideTranslations(
-        params.locale ?? 'en',
-        ['apps-journeys', 'libs-journeys-ui'],
-        i18nConfig
-      )),
       journey: data.journey,
       locale,
       rtl

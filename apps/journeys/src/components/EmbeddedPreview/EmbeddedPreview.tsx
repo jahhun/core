@@ -1,7 +1,9 @@
+'use client'
+
 import Close from '@mui/icons-material/Close'
 import Box from '@mui/material/Box'
 import IconButton from '@mui/material/IconButton'
-import { useRouter } from 'next/router'
+import { useSearchParams } from 'next/navigation'
 import { ReactElement, useCallback, useEffect, useRef, useState } from 'react'
 import { use100vh } from 'react-div-100vh'
 
@@ -38,8 +40,7 @@ export function EmbeddedPreview({
     [setIsFullWindow]
   )
 
-  // use router internally on this component as it does not function properly when passed as prop
-  const router = useRouter()
+  const searchParams = useSearchParams()
   const once = useRef(false)
 
   const handleClick = useCallback((): void => {
@@ -48,16 +49,16 @@ export function EmbeddedPreview({
 
   useEffect(() => {
     if (!once.current) {
-      if (router?.query?.preview === 'true') {
+      if (searchParams?.get('preview') === 'true') {
         setAllowFullWindow(false)
         once.current = true
       }
-      if (router?.query?.autoexpand === 'true') {
+      if (searchParams?.get('autoexpand') === 'true') {
         handleClick()
         once.current = true
       }
     }
-  }, [setAllowFullWindow, handleClick, router?.query])
+  }, [setAllowFullWindow, handleClick, searchParams])
 
   const ClickableCard = (): ReactElement => (
     <Box

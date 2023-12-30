@@ -1,6 +1,6 @@
 const { composePlugins, withNx } = require('@nx/next')
 
-const { i18n } = require('./next-i18next.config')
+// const { i18n } = require('./next-i18next.config')
 
 /**
  * @type {import('@nx/next/plugins/with-nx').WithNxOptions}
@@ -11,7 +11,7 @@ const nextConfig = {
     // See: https://github.com/gregberge/svgr
     svgr: false
   },
-  i18n,
+  // i18n,
   images: {
     domains: [
       'images.unsplash.com',

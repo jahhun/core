@@ -1,15 +1,13 @@
 import { notFound } from 'next/navigation'
-import { serverSideTranslations } from 'next-i18next/serverSideTranslations'
 import { ReactNode } from 'react'
 
 import { getJourneyRTL } from '@core/journeys/ui/rtl'
 
 import { GetJourney } from '../../../../__generated__/GetJourney'
-import i18nConfig from '../../../../next-i18next.config'
-import { createApolloClient } from '../../../../src/libs/apolloClient'
-import { GET_JOURNEY } from '../../../queries'
+import { GET_JOURNEY } from '../../queries'
 
 import JourneyStepPage from './JourneyStepPage'
+import { getApolloClient } from '../../../../src/libs/apolloClient/apolloClient'
 
 interface JourneyStepPageParams {
   journeySlug: string
@@ -22,9 +20,8 @@ export default async function Page({
 }: {
   params: JourneyStepPageParams
 }): Promise<ReactNode> {
-  const apolloClient = createApolloClient()
   try {
-    const { data } = await apolloClient.query<GetJourney>({
+    const { data } = await getApolloClient().query<GetJourney>({
       query: GET_JOURNEY,
       variables: {
         id: params.journeySlug
@@ -32,11 +29,6 @@ export default async function Page({
     })
     const { rtl, locale } = getJourneyRTL(data.journey)
     const props = {
-      ...(await serverSideTranslations(
-        params.locale ?? 'en',
-        ['apps-journeys', 'libs-journeys-ui'],
-        i18nConfig
-      )),
       journey: data.journey,
       locale,
       rtl,

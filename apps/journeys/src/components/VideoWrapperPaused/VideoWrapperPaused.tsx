@@ -1,3 +1,5 @@
+'use client'
+
 import { ReactElement } from 'react'
 
 import { WrapperProps } from '@core/journeys/ui/BlockRenderer'

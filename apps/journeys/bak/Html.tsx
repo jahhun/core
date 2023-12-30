@@ -1,11 +1,17 @@
 import { AppRouterCacheProvider } from '@mui/material-nextjs/v13-appRouter'
 import { ReactNode } from 'react'
+import TranslationsProvider from '../src/components/TranslationProvider/TranslationProvider'
+import { initTranslations } from '../src/libs/i18n'
+import JourneysApp from '../app/[locale]/JourneysApp'
 
-export default function Html({
+const i18nNamespaces = ['apps-journeys', 'libs-journeys-ui']
+
+export default async function Html({
   rtl = false,
   locale = 'en',
   children
-}): ReactNode {
+}): Promise<ReactNode> {
+  const { resources } = await initTranslations('en', i18nNamespaces)
   return (
     <html lang="en" dir={rtl ? 'rtl' : ''}>
       <head>
@@ -56,7 +62,15 @@ export default function Html({
         {this.props.emotionStyleTags}
       </head>
       <body>
-        <AppRouterCacheProvider>{children}</AppRouterCacheProvider>
+        <AppRouterCacheProvider>
+          <TranslationsProvider
+            namespaces={i18nNamespaces}
+            locale="en"
+            resources={resources}
+          >
+            <JourneysApp>{children}</JourneysApp>
+          </TranslationsProvider>
+        </AppRouterCacheProvider>
       </body>
     </html>
   )
