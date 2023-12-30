@@ -1,18 +1,14 @@
-import { NextApiRequest, NextApiResponse } from 'next'
+import { NextRequest } from 'next/server'
 
-import { GetJourney } from '../../__generated__/GetJourney'
-import { createApolloClient } from '../../src/libs/apolloClient'
-import { GET_JOURNEY } from '../[journeySlug]'
+import { GetJourney } from '../../../__generated__/GetJourney'
+import { getApolloClient } from '../../../src/libs/apolloClient/apolloClient'
+import { GET_JOURNEY } from '../../[locale]/queries'
 
-const apolloClient = createApolloClient()
-
-export default async function Handler(
-  req: NextApiRequest,
-  res: NextApiResponse
-): Promise<void> {
+export async function GET(req: NextRequest): Promise<Response> {
   try {
-    const journeySlug = req.query.url?.toString().split('/').pop()
-    const { data } = await apolloClient.query<GetJourney>({
+    const searchParams = req.nextUrl.searchParams
+    const journeySlug = searchParams.get('url')?.toString().split('/').pop()
+    const { data } = await getApolloClient().query<GetJourney>({
       query: GET_JOURNEY,
       variables: {
         id: journeySlug
@@ -41,12 +37,12 @@ export default async function Handler(
       thumbnail_width: data.journey.primaryImageBlock?.width
     }
 
-    res.status(200).send(oembed)
+    return Response.json(oembed)
   } catch (error) {
     if (error.message === 'journey not found') {
-      res.status(404).send('journey not found')
+      return Response.json({ error: 'journey not found' }, { status: 404 })
     } else {
-      res.status(500).send('server error')
+      return Response.json({ error: 'server error' }, { status: 500 })
     }
   }
 }

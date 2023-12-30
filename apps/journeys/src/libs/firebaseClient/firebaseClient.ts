@@ -1,3 +1,5 @@
+'use client'
+
 import { initializeApp } from 'firebase/app'
 
 export const firebaseClient = initializeApp({

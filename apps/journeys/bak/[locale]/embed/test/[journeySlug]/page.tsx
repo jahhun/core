@@ -15,7 +15,7 @@ import { allowedHost } from '@core/journeys/ui/allowedHost'
 import { ThemeProvider } from '@core/shared/ui/ThemeProvider'
 import { ThemeMode, ThemeName } from '@core/shared/ui/themes'
 
-import logo from '../../../public/logo.svg'
+import { ReactComponent as logo } from '../../../public/logo.svg'
 
 export default function IFrameTest(): ReactElement {
   const { query } = useRouter()
