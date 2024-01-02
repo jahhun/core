@@ -1,5 +1,3 @@
-'use client'
-
 import Box from '@mui/material/Box'
 import Button from '@mui/material/Button'
 import Container from '@mui/material/Container'
@@ -15,9 +13,9 @@ import { allowedHost } from '@core/journeys/ui/allowedHost'
 import { ThemeProvider } from '@core/shared/ui/ThemeProvider'
 import { ThemeMode, ThemeName } from '@core/shared/ui/themes'
 
-import { ReactComponent as logo } from '../../../public/logo.svg'
+import logo from '../../../public/logo.svg'
 
-export default function IFrameTest(): ReactElement {
+export function IFrameTest(): ReactElement {
   const { query } = useRouter()
   const viewportHeight = use100vh()
   useEffect(() => {
@@ -117,3 +115,5 @@ export default function IFrameTest(): ReactElement {
     </ThemeProvider>
   )
 }
+
+export default IFrameTest
