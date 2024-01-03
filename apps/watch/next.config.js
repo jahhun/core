@@ -32,7 +32,7 @@ const nextConfig = {
     // handled by github actions
     ignoreDuringBuilds: process.env.CI === 'true'
   },
-  transpilePackages: ['shared-ui'],
+  // transpilePackages: ['shared-ui'],
   experimental: {
     outputFileTracingExcludes: {
       '*': [

@@ -1,3 +1,5 @@
+'use client'
+
 import { ReactElement, ReactNode, createContext, useContext } from 'react'
 
 import { VideoContentFields } from '../../../__generated__/VideoContentFields'

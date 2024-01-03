@@ -1,27 +1,17 @@
-import { NormalizedCacheObject } from '@apollo/client'
-import { GetStaticProps } from 'next'
 import { ReactElement } from 'react'
 
 import {
   GetHomeVideos,
   GetHomeVideos_videos as Video
-} from '../__generated__/GetHomeVideos'
-import { Videos } from '../src/components/VideosPage'
+} from '../../__generated__/GetHomeVideos'
+import { Videos } from '../../src/components/VideosPage'
 import {
   GET_LANGUAGES,
   GET_VIDEOS,
   limit
-} from '../src/components/VideosPage/VideosPage'
-import { createApolloClient } from '../src/libs/apolloClient'
-
-import { GET_HOME_VIDEOS } from './index'
-
-interface VideosPageProps {
-  initialApolloState: NormalizedCacheObject
-}
-function VideosPage({ videos }): ReactElement {
-  return <Videos videos={videos} />
-}
+} from '../../src/components/VideosPage/VideosPage'
+import { getApolloClient } from '../../src/libs/apolloClient/apolloClient'
+import { GET_HOME_VIDEOS } from '../queries'
 
 const videoIds = [
   '1_jf-0-0',
@@ -47,10 +37,8 @@ const videoIds = [
   'LUMOCollection'
 ]
 
-export const getStaticProps: GetStaticProps<VideosPageProps> = async () => {
-  const apolloClient = createApolloClient()
-
-  const { data } = await apolloClient.query<GetHomeVideos>({
+export default async function VideosPage(): Promise<ReactElement> {
+  const { data } = await getApolloClient().query<GetHomeVideos>({
     query: GET_HOME_VIDEOS,
     variables: {
       ids: videoIds,
@@ -64,7 +52,7 @@ export const getStaticProps: GetStaticProps<VideosPageProps> = async () => {
     videos[videoIds.indexOf(video.id)] = video
   })
 
-  await apolloClient.query({
+  await getApolloClient().query({
     query: GET_VIDEOS,
     variables: {
       where: {},
@@ -73,19 +61,12 @@ export const getStaticProps: GetStaticProps<VideosPageProps> = async () => {
       languageId: '529'
     }
   })
-  await apolloClient.query({
+
+  await getApolloClient().query({
     query: GET_LANGUAGES,
     variables: {
       languageId: '529'
     }
   })
-
-  return {
-    revalidate: 3600,
-    props: {
-      initialApolloState: apolloClient.cache.extract(),
-      videos
-    }
-  }
+  return <Videos videos={videos} />
 }
-export default VideosPage
