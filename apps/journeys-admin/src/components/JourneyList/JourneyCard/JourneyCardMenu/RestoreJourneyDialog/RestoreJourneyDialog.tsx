@@ -2,7 +2,6 @@ import { ApolloQueryResult, gql, useMutation } from '@apollo/client'
 import Typography from '@mui/material/Typography'
 import { useSnackbar } from 'notistack'
 import { ReactElement } from 'react'
-import { useTranslation } from 'react-i18next'
 
 import { Dialog } from '@core/shared/ui/Dialog'
 
@@ -35,7 +34,6 @@ export function RestoreJourneyDialog({
   refetch
 }: RestoreJourneyDialogProps): ReactElement {
   const { enqueueSnackbar } = useSnackbar()
-  const { t } = useTranslation('apps-journeys-admin')
 
   const previousStatus = published
     ? JourneyStatus.published
@@ -86,7 +84,7 @@ export function RestoreJourneyDialog({
       testId="RestoreJourneyDialog"
     >
       <Typography>
-        {t('Are you sure you would like to restore this journey?')}
+        Are you sure you would like to restore this journey?
       </Typography>
     </Dialog>
   )

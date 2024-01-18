@@ -5,7 +5,6 @@ import Typography from '@mui/material/Typography'
 import Box from '@mui/system/Box'
 import fetch from 'node-fetch'
 import { ReactElement, useEffect, useRef, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 import useSWR from 'swr'
 import videojs from 'video.js'
 import Player from 'video.js/dist/types/player'
@@ -79,7 +78,6 @@ export function YouTubeDetails({
   }, [data])
 
   const loading = data == null && error == null
-  const { t } = useTranslation('apps-journeys-admin')
 
   return (
     <Stack spacing={4} sx={{ p: 6 }} data-testid="YoutubeDetails">
@@ -158,7 +156,7 @@ export function YouTubeDetails({
           disabled={loading}
           sx={{ backgroundColor: 'secondary.dark' }}
         >
-          {t('Select')}
+          Select
         </Button>
       </Stack>
     </Stack>

@@ -9,7 +9,6 @@ import {
 } from 'firebase/auth'
 import Image from 'next/image'
 import { ReactElement, useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 
 import { StyledFirebaseAuth } from '@core/shared/ui/StyledFirebaseAuth'
 
@@ -48,7 +47,7 @@ export function SignIn(): ReactElement {
         false
     }
   }
-  const { t } = useTranslation('apps-journeys-admin')
+
   return (
     <div>
       {renderAuth ? (
@@ -73,7 +72,7 @@ export function SignIn(): ReactElement {
             }}
           />
           <Typography variant="h5" sx={{ mt: 20, mb: 3 }}>
-            {t('Sign In')}
+            Sign In
           </Typography>
           <StyledFirebaseAuth
             uiConfig={firebaseAuthConfig}
@@ -85,7 +84,7 @@ export function SignIn(): ReactElement {
             component="a"
             href="mailto:support@nextstep.is?Subject=Support%2FFeedback%20Request"
           >
-            {t('Feedback & Support')}
+            Feedback & Support
           </Typography>
         </Box>
       ) : null}

@@ -5,7 +5,6 @@ import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import NextLink from 'next/link'
 import { ReactElement } from 'react'
-import { useTranslation } from 'react-i18next'
 
 import ChevronRightIcon from '@core/shared/ui/icons/ChevronRight'
 
@@ -13,7 +12,6 @@ import { JourneysReportType } from '../../../__generated__/globalTypes'
 import { MemoizedDynamicReport } from '../DynamicPowerBiReport'
 
 export function MultipleSummaryReport(): ReactElement {
-  const { t } = useTranslation('apps-journeys-admin')
   return (
     <Box
       sx={{
@@ -25,7 +23,7 @@ export function MultipleSummaryReport(): ReactElement {
       <Container maxWidth="lg" sx={{ px: { xs: 6, sm: 8 } }}>
         <Stack direction="row" spacing={4} sx={{ py: 2 }}>
           <Typography variant="subtitle1" sx={{ pt: 1 }}>
-            {t('Reports')}
+            Reports
           </Typography>
           <NextLink href="/reports" passHref legacyBehavior prefetch={false}>
             <Button
@@ -33,7 +31,7 @@ export function MultipleSummaryReport(): ReactElement {
               variant="text"
               endIcon={<ChevronRightIcon sx={{ fontSize: 1 }} />}
             >
-              {t('See all')}
+              See all
             </Button>
           </NextLink>
         </Stack>

@@ -1,6 +1,5 @@
 import Fab from '@mui/material/Fab'
 import { ReactElement } from 'react'
-import { useTranslation } from 'react-i18next'
 
 import Plus2Icon from '@core/shared/ui/icons/Plus2'
 
@@ -11,7 +10,6 @@ export function AddJourneyFab(): ReactElement {
     state: { mobileDrawerOpen },
     dispatch
   } = usePage()
-  const { t } = useTranslation('apps-journeys-admin')
 
   return (
     <Fab
@@ -34,7 +32,7 @@ export function AddJourneyFab(): ReactElement {
       data-testid="AddJourneyFab"
     >
       <Plus2Icon sx={{ mr: 3 }} />
-      {t('Add')}
+      Add
     </Fab>
   )
 }

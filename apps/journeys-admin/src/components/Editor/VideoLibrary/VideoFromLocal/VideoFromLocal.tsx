@@ -2,7 +2,6 @@ import { gql, useQuery } from '@apollo/client'
 import Box from '@mui/material/Box'
 import Typography from '@mui/material/Typography'
 import { ReactElement, useEffect, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 
 import { GetVideos } from '../../../../../__generated__/GetVideos'
 import {
@@ -74,7 +73,6 @@ export function VideoFromLocal({
     }
   })
   const [hasMore, setHasMore] = useState(true)
-  const { t } = useTranslation('apps-journeys-admin')
   const handleFetchMore = async (): Promise<void> => {
     const response = await fetchMore({
       variables: {
@@ -97,9 +95,9 @@ export function VideoFromLocal({
         {searchQuery === '' && (
           <Box sx={{ pb: 4, px: 6 }}>
             <Typography variant="overline" color="primary">
-              {t('Jesus Film Library')}
+              Jesus Film Library
             </Typography>
-            <Typography variant="h6">{t('Featured Videos')}</Typography>
+            <Typography variant="h6">Featured Videos</Typography>
           </Box>
         )}
         <VideoList

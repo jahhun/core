@@ -9,7 +9,6 @@ import ListItemText from '@mui/material/ListItemText'
 import Typography from '@mui/material/Typography'
 import { useRouter } from 'next/router'
 import { ReactElement, useState } from 'react'
-import { useTranslation } from 'react-i18next'
 
 import AlertCircleIcon from '@core/shared/ui/icons/AlertCircle'
 import ArrowRightSmIcon from '@core/shared/ui/icons/ArrowRightSm'
@@ -44,12 +43,12 @@ export function TermsAndConditions(): ReactElement {
       query: { redirect: router.query.redirect }
     })
   }
-  const { t } = useTranslation('apps-journeys-admin')
+
   return (
     <>
-      <Typography variant="h4">{t('Before You Start')}</Typography>
+      <Typography variant="h4">Before You Start</Typography>
       <Typography variant="body1" sx={{ mt: 3 }}>
-        {t('Please review these documents:')}
+        Please review these documents:
       </Typography>
       <List
         sx={{
@@ -93,7 +92,7 @@ export function TermsAndConditions(): ReactElement {
             id="i-agree-label"
             primary={
               <Typography variant="body1" color="secondary.dark">
-                {t('I agree with listed above conditions and requirements')}
+                I agree with listed above conditions and requirements
               </Typography>
             }
           />
@@ -116,7 +115,7 @@ export function TermsAndConditions(): ReactElement {
         }}
         endIcon={<ArrowRightSmIcon />}
       >
-        {t('Next')}
+        Next
       </Button>
     </>
   )

@@ -9,7 +9,6 @@ import RadioGroup from '@mui/material/RadioGroup'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { ReactElement } from 'react'
-import { useTranslation } from 'react-i18next'
 
 import X2Icon from '@core/shared/ui/icons/X2'
 
@@ -38,13 +37,12 @@ export function FilterDrawer({
   hideInteractive,
   handleClearAll
 }: FilterDrawerProps): ReactElement {
-  const { t } = useTranslation('apps-journeys-admin')
   return (
     <Box sx={{ height: '100vh' }} data-testid="FilterDrawer">
       <Box sx={{ display: { sm: 'block', md: 'none' } }}>
         <Stack direction="row" sx={{ px: 6, py: 2 }} alignItems="center">
           <Typography variant="subtitle1">
-            {t('Filters')} <ClearAllButton handleClearAll={handleClearAll} />
+            Filters <ClearAllButton handleClearAll={handleClearAll} />
           </Typography>
           <IconButton sx={{ ml: 'auto' }}>
             <X2Icon onClick={handleClose} />
@@ -54,7 +52,7 @@ export function FilterDrawer({
       </Box>
 
       <Box sx={{ px: 6, py: 5 }}>
-        <Typography variant="subtitle2">{t('Categories')}</Typography>
+        <Typography variant="subtitle2">Categories</Typography>
         <FormGroup>
           <FormControlLabel
             control={<Checkbox />}
@@ -97,7 +95,7 @@ export function FilterDrawer({
       <Divider />
 
       <Box sx={{ px: 6, py: 5 }}>
-        <Typography variant="subtitle2">{t('Sort By')}</Typography>
+        <Typography variant="subtitle2">Sort By</Typography>
         <RadioGroup
           aria-labelledby="journeys-sort-radio-buttons-group"
           defaultValue="date"
