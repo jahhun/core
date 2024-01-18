@@ -10,7 +10,6 @@ import Typography from '@mui/material/Typography'
 import debounce from 'lodash/debounce'
 import { ReactElement, useEffect, useRef, useState } from 'react'
 import { HexColorPicker } from 'react-colorful'
-
 import { useTranslation } from 'react-i18next'
 
 import type { TreeBlock } from '@core/journeys/ui/block'

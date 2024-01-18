@@ -5,7 +5,6 @@ import ButtonGroup from '@mui/material/ButtonGroup'
 import { styled } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import { ReactElement } from 'react'
-
 import { useTranslation } from 'react-i18next'
 
 import type { TreeBlock } from '@core/journeys/ui/block'

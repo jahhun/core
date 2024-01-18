@@ -2,7 +2,6 @@ import { gql, useMutation } from '@apollo/client'
 import Box from '@mui/material/Box'
 import { SimplePaletteColorOptions } from '@mui/material/styles'
 import { ReactElement } from 'react'
-
 import { useTranslation } from 'react-i18next'
 
 import type { TreeBlock } from '@core/journeys/ui/block'

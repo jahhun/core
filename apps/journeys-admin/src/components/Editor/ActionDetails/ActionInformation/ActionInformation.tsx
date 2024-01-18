@@ -1,7 +1,6 @@
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { ReactElement, ReactNode } from 'react'
-
 import { useTranslation } from 'react-i18next'
 
 import BibleIcon from '@core/shared/ui/icons/Bible'

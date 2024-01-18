@@ -6,7 +6,6 @@ import ToggleButtonGroup from '@mui/material/ToggleButtonGroup'
 import dynamic from 'next/dynamic'
 import { useRouter } from 'next/router'
 import { MouseEvent, ReactElement, useState } from 'react'
-
 import { useTranslation } from 'react-i18next'
 
 import type { TreeBlock } from '@core/journeys/ui/block'

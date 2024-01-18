@@ -10,7 +10,6 @@ import TableRow, { TableRowProps } from '@mui/material/TableRow'
 import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { ReactElement } from 'react'
-
 import { useTranslation } from 'react-i18next'
 
 import BibleIcon from '@core/shared/ui/icons/Bible'

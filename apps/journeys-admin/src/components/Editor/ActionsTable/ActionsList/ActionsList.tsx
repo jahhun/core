@@ -9,7 +9,6 @@ import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import Box from '@mui/system/Box'
 import { ReactElement, useEffect, useState } from 'react'
-
 import { useTranslation } from 'react-i18next'
 
 import { useEditor } from '@core/journeys/ui/EditorProvider'
