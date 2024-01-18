@@ -11,6 +11,8 @@ import Typography from '@mui/material/Typography'
 import useMediaQuery from '@mui/material/useMediaQuery'
 import { ReactElement } from 'react'
 
+import { useTranslation } from 'react-i18next'
+
 import BibleIcon from '@core/shared/ui/icons/Bible'
 import Edit2Icon from '@core/shared/ui/icons/Edit2'
 import LinkAngledIcon from '@core/shared/ui/icons/LinkAngled'
@@ -48,6 +50,8 @@ export function ActionsListView({
     }
   }
 
+  const { t } = useTranslation('apps-journeys-admin')
+
   return (
     <>
       {/* desktop view */}
@@ -66,11 +70,13 @@ export function ActionsListView({
             <TableRow sx={{ backgroundColor: 'background.paper' }}>
               <TableCell width={60} />
               <TableCell>
-                <Typography variant="subtitle2">Target and Action</Typography>
+                <Typography variant="subtitle2">
+                  {t('Target and Action')}
+                </Typography>
               </TableCell>
               <TableCell>
                 <Typography variant="subtitle2" align="center" width={100}>
-                  Appears on{' '}
+                  {t('Appears on {{space}}', { space: ' ' })}
                 </Typography>
               </TableCell>
               <TableCell width={50} />
@@ -148,7 +154,9 @@ export function ActionsListView({
           <TableHead sx={{ borderBottom: '1.5px solid #DEDFE0' }}>
             <TableRow>
               <TableCell>
-                <Typography variant="subtitle2">Target and Action</Typography>
+                <Typography variant="subtitle2">
+                  {t('Target and Action')}
+                </Typography>
               </TableCell>
             </TableRow>
           </TableHead>
@@ -185,9 +193,9 @@ export function ActionsListView({
                       </Typography>
                     </Stack>
                     <Typography variant="body2" color="secondary.light">
-                      Appears on{' '}
+                      {t('Appears on {{space}}', { space: ' ' })}
                       <span style={{ fontWeight: 'bold' }}>{count}</span>{' '}
-                      {count > 1 ? 'cards' : 'card'}
+                      {count > 1 ? t('cards') : t('card')}
                     </Typography>
                   </Stack>
                 </TableCell>

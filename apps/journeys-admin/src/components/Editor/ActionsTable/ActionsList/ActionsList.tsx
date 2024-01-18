@@ -10,6 +10,8 @@ import useMediaQuery from '@mui/material/useMediaQuery'
 import Box from '@mui/system/Box'
 import { ReactElement, useEffect, useState } from 'react'
 
+import { useTranslation } from 'react-i18next'
+
 import { useEditor } from '@core/journeys/ui/EditorProvider'
 import InformationCircleContainedIcon from '@core/shared/ui/icons/InformationCircleContained'
 import X2Icon from '@core/shared/ui/icons/X2'
@@ -73,6 +75,8 @@ export function ActionsList({
     // eslint-disable-next-line react-hooks/exhaustive-deps
   }, [selectedAction])
 
+  const { t } = useTranslation('apps-journeys-admin')
+
   return (
     <>
       <Stack
@@ -95,7 +99,7 @@ export function ActionsList({
               justifyContent: 'space-between'
             }}
           >
-            <Typography variant="h1">The Journey Goals</Typography>
+            <Typography variant="h1">{t('The Journey Goals')}</Typography>
             <Button
               variant="outlined"
               startIcon={
@@ -113,11 +117,13 @@ export function ActionsList({
               }}
               onClick={() => setOpen(true)}
             >
-              <Typography variant="subtitle2">Learn More</Typography>
+              <Typography variant="subtitle2">{t('Learn More')}</Typography>
             </Button>
           </Box>
           <Typography>
-            You can change them to your own clicking on the rows of this table
+            {t(
+              'You can change them to your own clicking on the rows of this table'
+            )}
           </Typography>
         </Stack>
         <ActionsListView
@@ -154,7 +160,7 @@ export function ActionsList({
               component="div"
               sx={{ flexGrow: 1 }}
             >
-              Information
+              {t('Information')}
             </Typography>
             <IconButton
               onClick={() => setOpen(false)}

@@ -4,6 +4,8 @@ import { useTheme } from '@mui/material/styles'
 import Typography from '@mui/material/Typography'
 import { ReactElement } from 'react'
 
+import { useTranslation } from 'react-i18next'
+
 import type { TreeBlock } from '@core/journeys/ui/block'
 import { useEditor } from '@core/journeys/ui/EditorProvider'
 import { useJourney } from '@core/journeys/ui/JourneyProvider'
@@ -65,6 +67,8 @@ export function Cards(): ReactElement {
     })
   }
 
+  const { t } = useTranslation('apps-journeys-admin')
+
   return (
     <>
       <Box sx={{ pl: 6, pr: 4, pt: 4 }}>
@@ -72,7 +76,7 @@ export function Cards(): ReactElement {
           variant="subtitle2"
           sx={{ [theme.breakpoints.down('sm')]: { display: 'none' } }}
         >
-          Cards
+          {t('Cards')}
         </Typography>
       </Box>
       <CardPreview

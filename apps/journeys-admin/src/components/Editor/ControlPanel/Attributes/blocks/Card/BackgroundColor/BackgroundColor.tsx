@@ -11,6 +11,8 @@ import debounce from 'lodash/debounce'
 import { ReactElement, useEffect, useRef, useState } from 'react'
 import { HexColorPicker } from 'react-colorful'
 
+import { useTranslation } from 'react-i18next'
+
 import type { TreeBlock } from '@core/journeys/ui/block'
 import { useEditor } from '@core/journeys/ui/EditorProvider'
 import { useJourney } from '@core/journeys/ui/JourneyProvider'
@@ -159,6 +161,8 @@ export function BackgroundColor(): ReactElement {
     </Box>
   )
 
+  const { t } = useTranslation('apps-journeys-admin')
+
   return (
     <>
       <Stack
@@ -215,12 +219,12 @@ export function BackgroundColor(): ReactElement {
       <Box sx={{ [cardTheme.breakpoints.down('sm')]: { display: 'none' } }}>
         <Divider />
         <Box sx={{ px: 6, pt: 4 }}>
-          <Typography variant="subtitle2">Palette</Typography>
+          <Typography variant="subtitle2">{t('Palette')}</Typography>
         </Box>
         {palettePicker}
         <Divider />
         <Box sx={{ px: 6, py: 4 }}>
-          <Typography variant="subtitle2">Custom</Typography>
+          <Typography variant="subtitle2">{t('Custom')}</Typography>
         </Box>
         {hexColorPicker}
       </Box>
