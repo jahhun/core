@@ -34,6 +34,11 @@ export function ActionNode({
     state: { selectedBlock }
   } = useEditor()
 
+  const isSourceConnectable = !(
+    block.__typename === 'ButtonBlock' &&
+    block.action?.__typename === 'LinkAction'
+  )
+
   async function onConnect(params): Promise<void> {
     if (journey == null) return
 
@@ -67,6 +72,7 @@ export function ActionNode({
     <BaseNode
       selected={selectedBlock?.id === block.id}
       isTargetConnectable={false}
+      isSourceConnectable={isSourceConnectable}
       onSourceConnect={onConnect}
       {...props}
     />
