@@ -6,11 +6,12 @@ import { AppCaslFactory } from '../../lib/casl/caslFactory'
 import { PrismaService } from '../../lib/prisma.service'
 
 import { UserTeamResolver } from './userTeam.resolver'
+import { UserTeamService } from './userTeam.service'
 
 @Global()
 @Module({
   imports: [CaslAuthModule.register(AppCaslFactory)],
   providers: [UserTeamResolver, PrismaService],
-  exports: []
+  exports: [UserTeamResolver, UserTeamService]
 })
 export class UserTeamModule {}
