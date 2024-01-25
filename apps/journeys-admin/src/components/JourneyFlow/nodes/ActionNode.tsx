@@ -12,8 +12,6 @@ import {
 import { NAVIGATE_TO_BLOCK_ACTION_UPDATE } from '../../Editor/ControlPanel/Attributes/Action/NavigateToBlockAction/NavigateToBlockAction'
 
 import { BaseNode } from './BaseNode'
-import { LinkActionUpdate } from '../../../../__generated__/LinkActionUpdate'
-import { LINK_ACTION_UPDATE } from '../../Editor/ControlPanel/Attributes/Action/LinkAction/LinkAction'
 
 export interface ActionNodeProps
   extends Omit<ComponentProps<typeof BaseNode>, 'isTargetConnectable'> {
@@ -29,8 +27,6 @@ export function ActionNode({
     NavigateToBlockActionUpdate,
     NavigateToBlockActionUpdateVariables
   >(NAVIGATE_TO_BLOCK_ACTION_UPDATE)
-
-  const [linkActionUpdate] = useMutation<LinkActionUpdate>(LINK_ACTION_UPDATE)
 
   const { journey } = useJourney()
 
@@ -63,29 +59,6 @@ export function ActionNode({
         }
       }
     })
-
-    // await linkActionUpdate({
-    //   variables: {
-    //     id: block.id,
-    //     journeyId: journey.id,
-    //     input: {
-    //       url: params.target
-    //     }
-    //   },
-    //   update(cache, { data }) {
-    //     if (data?.blockUpdateLinkAction != null) {
-    //       cache.modify({
-    //         id: cache.identify({
-    //           __typename: block.__typename,
-    //           id: block.id
-    //         }),
-    //         fields: {
-    //           action: () => data.blockUpdateLinkAction
-    //         }
-    //       })
-    //     }
-    //   }
-    // })
 
     onSourceConnect?.(params)
   }
