@@ -18,6 +18,11 @@ export function LinkActionNode({
 }: NodeProps<LinkActionNodeData>): ReactElement {
   const { t } = useTranslation('apps-journeys-admin')
   return (
-    <BaseNode title={action.url} icon={<Link />} isSourceConnectable={false} />
+    <BaseNode
+      title={action.url}
+      icon={<Link />}
+      isSourceConnectable={false}
+      isTargetEnabled={false}
+    />
   )
 }

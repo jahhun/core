@@ -10,6 +10,7 @@ export const NODE_HEIGHT = 80
 interface BaseNodeProps {
   isTargetConnectable?: boolean
   isSourceConnectable?: boolean
+  isTargetEnabled?: boolean
   onSourceConnect?: OnConnect
   icon: ReactNode
   title: string
@@ -19,6 +20,7 @@ interface BaseNodeProps {
 export function BaseNode({
   isTargetConnectable,
   isSourceConnectable,
+  isTargetEnabled = true,
   onSourceConnect,
   icon,
   title,
@@ -61,7 +63,11 @@ export function BaseNode({
         </Typography>
       </CardContent>
       {isTargetConnectable !== false && (
-        <Handle type="target" position={Position.Left} />
+        <Handle
+          type="target"
+          position={Position.Left}
+          isConnectable={isTargetEnabled}
+        />
       )}
       {isSourceConnectable !== false && (
         <Handle
