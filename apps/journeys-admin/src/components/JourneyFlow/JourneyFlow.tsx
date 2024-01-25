@@ -44,6 +44,8 @@ import {
 import { VideoBlockNode, VideoBlockNodeData } from './nodes/VideoBlockNode'
 
 import 'reactflow/dist/style.css'
+import { LinkActionNode, LinkActionNodeData } from './nodes/LinkActionNode'
+import { array } from 'prop-types'
 
 type InternalNode =
   | Node<StepBlockNodeData, 'StepBlock'>
@@ -53,6 +55,7 @@ type InternalNode =
   | Node<SignUpBlockNodeData, 'SignUpBlock'>
   | Node<FormBlockNodeData, 'FormBlock'>
   | Node<VideoBlockNodeData, 'VideoBlock'>
+  | Node<LinkActionNodeData, 'LinkAction'>
 
 function transformSteps(steps: Array<TreeBlock<StepBlock>>): {
   nodes: InternalNode[]
@@ -182,27 +185,52 @@ function transformSteps(steps: Array<TreeBlock<StepBlock>>): {
           break
       }
       if (block.action != null) {
-        if (block.action.__typename === 'NavigateToBlockAction') {
-          edges.push({
-            type: 'smoothstep',
-            id: `${block.id}->${block.action.blockId}`,
-            source: block.id,
-            target: block.action.blockId,
-            markerEnd: {
-              type: MarkerType.Arrow
-            },
-            style: {
-              strokeWidth: 2
-            }
-          })
-        }
-        if (block.action.__typename === 'NavigateAction') {
-          connectBlockToNextBlock({ block, step, steps })
+        switch (block.action.__typename) {
+          case 'NavigateToBlockAction':
+            edges.push({
+              type: 'smoothstep',
+              id: `${block.id}->${block.action.blockId}`,
+              source: block.id,
+              target: block.action.blockId,
+              markerEnd: {
+                type: MarkerType.Arrow
+              },
+              style: {
+                strokeWidth: 2
+              }
+            })
+            break
+          case 'NavigateAction':
+            connectBlockToNextBlock({ block, step, steps })
+            break
+          case 'LinkAction':
+            nodes.push({
+              id: `action-${block.action.parentBlockId}`,
+              type: block.action.__typename,
+              data: block.action,
+              selectable: false,
+              position: {
+                x: x + NODE_WIDTH + 20,
+                y: y + (NODE_HEIGHT + 20) * (index + 1)
+              }
+            })
+            edges.push({
+              type: 'smoothstep',
+              id: `${block.id}->action-${block.action.parentBlockId}`,
+              source: block.id,
+              target: `action-${block.action.parentBlockId}`,
+              markerEnd: {
+                type: MarkerType.Arrow
+              },
+              style: {
+                strokeWidth: 2
+              }
+            })
+            break
         }
       }
     })
   }
-
   steps.forEach((step, index) => {
     const x = index * (NODE_WIDTH + 100)
     const y = index * 50
@@ -256,7 +284,8 @@ export function JourneyFlow(): ReactElement {
           TextResponseBlock: TextResponseBlockNode,
           SignUpBlock: SignUpBlockNode,
           FormBlock: FormBlockNode,
-          VideoBlock: VideoBlockNode
+          VideoBlock: VideoBlockNode,
+          LinkAction: LinkActionNode
         }}
         proOptions={{ hideAttribution: true }}
       >
