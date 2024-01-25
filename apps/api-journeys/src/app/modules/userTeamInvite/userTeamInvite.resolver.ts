@@ -18,6 +18,7 @@ import { AppCaslGuard } from '../../lib/casl/caslGuard'
 import { PrismaService } from '../../lib/prisma.service'
 
 import { UserTeamInviteService } from './userTeamInvite.service'
+
  
 @Resolver('userTeamInvite')
 export class UserTeamInviteResolver {
