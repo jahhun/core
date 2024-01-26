@@ -105,6 +105,7 @@ export function LanguageSelector({
             return (
               // always display English
               l.id === '529' ||
+              l.id === '22658' || // Arabic for rtl testing purposes
               crowdinLanguageData?.data.approvalProgress === 100
             )
           })
