@@ -23,7 +23,10 @@ export function LanguageSelector({
   onClose
 }: LanguageSelectorProps): ReactElement {
   const router = useRouter()
-  const { t } = useTranslation('apps-journeys-admin')
+  const {
+    t,
+    i18n: { dir }
+  } = useTranslation('apps-journeys-admin')
 
   const [languageData, setLanguageData] = useState<Language[]>([])
 
@@ -122,9 +125,10 @@ export function LanguageSelector({
       const locale = language?.bcp47?.slice(0, 2)
 
       const path = router.asPath
-      return await router.push(path, path, { locale })
+      await router.push(path, path, { locale })
+      document.dir = dir()
     },
-    [router, data?.languages]
+    [router, data?.languages, dir]
   )
 
   return (
