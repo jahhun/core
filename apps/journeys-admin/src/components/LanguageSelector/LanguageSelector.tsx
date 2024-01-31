@@ -8,6 +8,7 @@ import { LanguageAutocomplete } from '@core/shared/ui/LanguageAutocomplete'
 
 import { GetLanguages_languages as Language } from '../../../__generated__/GetLanguages'
 import { useLanguagesQuery } from '../../libs/useLanguagesQuery'
+import { i18n } from 'next-i18next'
 
 interface LanguageSelectorProps {
   open: boolean
@@ -126,7 +127,7 @@ export function LanguageSelector({
 
       const path = router.asPath
       await router.push(path, path, { locale })
-      document.dir = dir()
+      document.dir = dir(i18n?.language ?? 'en')
     },
     [router, data?.languages, dir]
   )
