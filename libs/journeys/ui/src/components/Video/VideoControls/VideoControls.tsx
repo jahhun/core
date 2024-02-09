@@ -456,17 +456,6 @@ export function VideoControls({
                     }
                   }}
                 >
-                  <IconButton onClick={handleMute} sx={{ p: 0 }}>
-                    {muted || volume === 0 ? (
-                      <VolumeOffOutlined />
-                    ) : volume > 60 ? (
-                      <VolumeUpOutlined />
-                    ) : volume > 30 ? (
-                      <VolumeDownOutlined />
-                    ) : (
-                      <VolumeMuteOutlined />
-                    )}
-                  </IconButton>
                   <Slider
                     aria-label="volume-control"
                     min={0}
@@ -488,6 +477,17 @@ export function VideoControls({
                       }
                     }}
                   />
+                  <IconButton onClick={handleMute} sx={{ p: 0 }}>
+                    {muted || volume === 0 ? (
+                      <VolumeOffOutlined />
+                    ) : volume > 60 ? (
+                      <VolumeUpOutlined />
+                    ) : volume > 30 ? (
+                      <VolumeDownOutlined />
+                    ) : (
+                      <VolumeMuteOutlined />
+                    )}
+                  </IconButton>
                 </Stack>
                 <IconButton
                   aria-label="fullscreen"
