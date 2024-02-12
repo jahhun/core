@@ -34,6 +34,7 @@ interface BaseNodeProps {
   title: string
   selected?: 'descendant' | boolean
   variant?: 'step' | 'action'
+  isAllowDropdown: boolean
 }
 
 export function BaseNode({
@@ -44,14 +45,15 @@ export function BaseNode({
   icon,
   title,
   selected = false,
-  variant = 'step'
+  variant = 'step',
+  isAllowDropdown
 }: BaseNodeProps): ReactElement {
   const { journey } = useJourney()
   const [stepAndCardBlockCreate] = useStepAndCardBlockCreateMutation()
   const [isHovered, setIsHovered] = useState(false)
 
   const handleMouseEnter = (): void => {
-    setIsHovered(true)
+    isAllowDropdown ?? setIsHovered(true)
   }
 
   const handleMouseLeave = (): void => {
@@ -127,7 +129,8 @@ export function BaseNode({
                   overflow: 'hidden'
                 }}
               >
-                {title}
+                {/* for testing change back to title later */}
+                {isAllowDropdown ? 'yes' : 'no'}
               </Typography>
             </CardContent>
             <Handle
@@ -179,7 +182,7 @@ export function BaseNode({
                 }}
               />
             )}
-            {isHovered && (
+            {isHovered && isAllowDropdown && (
               <Box
                 className="dragToCreateHitbox"
                 style={{

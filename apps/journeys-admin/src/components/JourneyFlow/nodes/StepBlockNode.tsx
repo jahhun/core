@@ -95,6 +95,18 @@ export function StepBlockNode({
     })
   }
 
+  function isAllowDropdown(step): boolean {
+    console.log('step - ', step)
+    if (step.nextBlockId === null) {
+      // TODO: add: AND IF children[0] doenst contain a type button      video shoudlnt even pop up tbh ask tatai
+      console.log('found you!')
+      return true
+    } else {
+      console.log('no')
+      return false
+    }
+  }
+
   function handleClick(): void {
     dispatch({ type: 'SetSelectedStepAction', step })
   }
@@ -123,6 +135,7 @@ export function StepBlockNode({
         )
       }
       title={title}
+      isAllowDropdown={isAllowDropdown(step)}
     />
   )
 }
