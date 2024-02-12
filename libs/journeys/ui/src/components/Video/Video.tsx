@@ -46,29 +46,35 @@ const StyledVideoGradient = styled(Box)`
   );
 `
 
-export function Video({
-  id: blockId,
-  video,
-  source,
-  videoId,
-  image,
-  title,
-  autoplay,
-  startAt = 0,
-  endAt,
-  muted,
-  posterBlockId,
-  children,
-  action,
-  objectFit,
-  activeStep
-}: TreeBlock<VideoFields> & { activeStep: boolean }): ReactElement {
+export function Video(
+  props: TreeBlock<VideoFields> & { activeStep: boolean }
+): ReactElement {
   const [loading, setLoading] = useState(true)
   const [showPoster, setShowPoster] = useState(true)
   const theme = useTheme()
   const videoRef = useRef<HTMLVideoElement>(null)
   const [player, setPlayer] = useState<Player>()
   const hundredVh = use100vh()
+
+  console.log(props)
+
+  const {
+    id: blockId,
+    video,
+    source,
+    videoId,
+    image,
+    title,
+    autoplay,
+    startAt = 0,
+    endAt,
+    muted,
+    posterBlockId,
+    children,
+    action,
+    objectFit,
+    activeStep
+  } = props
 
   const {
     state: { selectedBlock }

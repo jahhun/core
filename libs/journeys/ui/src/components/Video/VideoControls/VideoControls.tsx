@@ -242,7 +242,8 @@ export function VideoControls({
     }
   }
 
-  function handleMute(): void {
+  function handleMute(e): void {
+    e.stopPropagation()
     setMuted(!muted)
     player.muted(!muted)
   }
