@@ -53,7 +53,7 @@ export function BaseNode({
   const [isHovered, setIsHovered] = useState(false)
 
   const handleMouseEnter = (): void => {
-    isAllowDropdown ?? setIsHovered(true)
+    setIsHovered(true)
   }
 
   const handleMouseLeave = (): void => {
@@ -129,8 +129,7 @@ export function BaseNode({
                   overflow: 'hidden'
                 }}
               >
-                {/* for testing change back to title later */}
-                {isAllowDropdown ? 'yes' : 'no'}
+                {title}
               </Typography>
             </CardContent>
             <Handle
@@ -178,7 +177,8 @@ export function BaseNode({
                       : '2px solid #aaacbb ',
                   outline: '1.5px solid white',
                   outlineColor: 'white',
-                  visibility: isHovered ? 'hidden' : 'visible'
+                  visibility:
+                    isHovered && isAllowDropdown ? 'hidden' : 'visible'
                 }}
               />
             )}

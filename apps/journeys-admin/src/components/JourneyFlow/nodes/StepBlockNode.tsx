@@ -96,13 +96,24 @@ export function StepBlockNode({
   }
 
   function isAllowDropdown(step): boolean {
-    console.log('step - ', step)
-    if (step.nextBlockId === null) {
-      // TODO: add: AND IF children[0] doenst contain a type button      video shoudlnt even pop up tbh ask tatai
-      console.log('found you!')
+    const childrenArray = step.children[0].children
+
+    const hasButtonBlock = childrenArray.some((child) => {
+      return Boolean(child) && child.__typename === 'ButtonBlock'
+    })
+
+    const hasVideoBlock = childrenArray.some((child) => {
+      return Boolean(child) && child.__typename === 'VideoBlock'
+    })
+
+    if (
+      step.nextBlockId === null &&
+      hasButtonBlock === false &&
+      hasVideoBlock === false
+    ) {
+      console.log('found you!', step)
       return true
     } else {
-      console.log('no')
       return false
     }
   }
