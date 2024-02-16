@@ -14,8 +14,8 @@ import {
   ThemeName,
   VideoBlockSource
 } from '../../../../../../../../__generated__/globalTypes'
+import { TestEditorState } from '../../../../../../../libs/TestEditorState'
 import { ThemeProvider } from '../../../../../../ThemeProvider'
-import { Drawer } from '../../../Drawer'
 
 import { Card } from '.'
 
@@ -33,8 +33,16 @@ describe('Card', () => {
       fullscreen: false,
       children: []
     }
-    const { getByRole } = render(<Card {...card} />)
 
+    const { getByRole } = render(
+      <MockedProvider>
+        <SnackbarProvider>
+          <EditorProvider>
+            <Card {...card} />
+          </EditorProvider>
+        </SnackbarProvider>
+      </MockedProvider>
+    )
     expect(getByRole('button', { name: 'Color #FEFEFE' })).toBeInTheDocument()
     expect(
       getByRole('button', { name: 'Layout Contained' })
@@ -98,9 +106,13 @@ describe('Card', () => {
 
     it('shows background color from prop', () => {
       const { getByRole } = render(
-        <JourneyProvider value={{ journey, variant: 'admin' }}>
-          <Card {...card} backgroundColor="#00FFCC" />
-        </JourneyProvider>
+        <MockedProvider>
+          <SnackbarProvider>
+            <JourneyProvider value={{ journey, variant: 'admin' }}>
+              <Card {...card} backgroundColor="#00FFCC" />
+            </JourneyProvider>
+          </SnackbarProvider>
+        </MockedProvider>
       )
 
       expect(getByRole('button', { name: 'Color #00FFCC' })).toBeInTheDocument()
@@ -108,13 +120,17 @@ describe('Card', () => {
 
     it('shows background color from card theme', () => {
       const { getByRole } = render(
-        <JourneyProvider value={{ journey, variant: 'admin' }}>
-          <Card
-            {...card}
-            themeName={ThemeName.base}
-            themeMode={ThemeMode.light}
-          />
-        </JourneyProvider>
+        <MockedProvider>
+          <SnackbarProvider>
+            <JourneyProvider value={{ journey, variant: 'admin' }}>
+              <Card
+                {...card}
+                themeName={ThemeName.base}
+                themeMode={ThemeMode.light}
+              />
+            </JourneyProvider>
+          </SnackbarProvider>
+        </MockedProvider>
       )
 
       expect(getByRole('button', { name: 'Color #FEFEFE' })).toBeInTheDocument()
@@ -122,29 +138,37 @@ describe('Card', () => {
 
     it('shows background color from journey theme', () => {
       const { getByRole } = render(
-        <JourneyProvider value={{ journey, variant: 'admin' }}>
-          <Card {...card} />
-        </JourneyProvider>
+        <MockedProvider>
+          <SnackbarProvider>
+            <JourneyProvider value={{ journey, variant: 'admin' }}>
+              <Card {...card} />
+            </JourneyProvider>
+          </SnackbarProvider>
+        </MockedProvider>
       )
 
       expect(getByRole('button', { name: 'Color #30313D' })).toBeInTheDocument()
     })
 
-    it('shows background color drawer', () => {
+    it('opens background color attribute', () => {
       const { getByText } = render(
         <MockedProvider>
-          <ThemeProvider>
-            <JourneyProvider value={{ journey, variant: 'admin' }}>
-              <EditorProvider>
-                <Drawer />
-                <Card {...card} backgroundColor="#00FFCC" />
-              </EditorProvider>
-            </JourneyProvider>
-          </ThemeProvider>
+          <SnackbarProvider>
+            <ThemeProvider>
+              <JourneyProvider value={{ journey, variant: 'admin' }}>
+                <EditorProvider>
+                  <Card {...card} backgroundColor="#00FFCC" />
+                  <TestEditorState />
+                </EditorProvider>
+              </JourneyProvider>
+            </ThemeProvider>
+          </SnackbarProvider>
         </MockedProvider>
       )
       fireEvent.click(getByText('#00FFCC'))
-      expect(getByText('Background Color Properties')).toBeInTheDocument()
+      expect(
+        getByText('selectedAttributeId: card1.id-background-color')
+      ).toBeInTheDocument()
     })
   })
 
@@ -175,17 +199,18 @@ describe('Card', () => {
           }
         ]
       }
-      const { getByText } = render(
+      const { getByText, getByTestId } = render(
         <MockedProvider>
-          <ThemeProvider>
-            <EditorProvider>
-              <Drawer />
-              <Card {...card} />
-            </EditorProvider>
-          </ThemeProvider>
+          <SnackbarProvider>
+            <ThemeProvider>
+              <EditorProvider>
+                <Card {...card} />
+              </EditorProvider>
+            </ThemeProvider>
+          </SnackbarProvider>
         </MockedProvider>
       )
-      expect(getByText('Background Image')).toBeInTheDocument()
+      expect(getByTestId('Image3Icon')).toBeInTheDocument()
       expect(getByText('07iLnvN.jpg')).toBeInTheDocument()
     })
 
@@ -242,21 +267,22 @@ describe('Card', () => {
           }
         ]
       }
-      const { getByText } = render(
+      const { getByText, getByTestId } = render(
         <MockedProvider>
-          <ThemeProvider>
-            <EditorProvider>
-              <Drawer />
-              <Card {...card} />
-            </EditorProvider>
-          </ThemeProvider>
+          <SnackbarProvider>
+            <ThemeProvider>
+              <EditorProvider>
+                <Card {...card} />
+              </EditorProvider>
+            </ThemeProvider>
+          </SnackbarProvider>
         </MockedProvider>
       )
-      expect(getByText('Background Video')).toBeInTheDocument()
+      expect(getByTestId('VideoOnIcon')).toBeInTheDocument()
       expect(getByText('FallingPlates')).toBeInTheDocument()
     })
 
-    it('shows background media drawer', () => {
+    it('opens background media attribute', () => {
       const card: TreeBlock<CardBlock> = {
         id: 'card1.id',
         __typename: 'CardBlock',
@@ -314,15 +340,17 @@ describe('Card', () => {
           <ThemeProvider>
             <EditorProvider initialState={{ selectedBlock: card }}>
               <SnackbarProvider>
-                <Drawer />
                 <Card {...card} />
+                <TestEditorState />
               </SnackbarProvider>
             </EditorProvider>
           </ThemeProvider>
         </MockedProvider>
       )
       fireEvent.click(getByText('FallingPlates'))
-      expect(getByText('Background Media')).toBeInTheDocument()
+      expect(
+        getByText('selectedAttributeId: card1.id-cover-block')
+      ).toBeInTheDocument()
     })
   })
 
@@ -340,7 +368,13 @@ describe('Card', () => {
         fullscreen: false,
         children: []
       }
-      const { getByText } = render(<Card {...card} />)
+      const { getByText } = render(
+        <MockedProvider>
+          <SnackbarProvider>
+            <Card {...card} />
+          </SnackbarProvider>
+        </MockedProvider>
+      )
       expect(getByText('Light')).toBeInTheDocument()
     })
 
@@ -357,11 +391,17 @@ describe('Card', () => {
         fullscreen: false,
         children: []
       }
-      const { getByText } = render(<Card {...card} />)
+      const { getByText } = render(
+        <MockedProvider>
+          <SnackbarProvider>
+            <Card {...card} />
+          </SnackbarProvider>
+        </MockedProvider>
+      )
       expect(getByText('Dark')).toBeInTheDocument()
     })
 
-    it('shows card styling drawer', () => {
+    it('opens card styling accordion', () => {
       const card: TreeBlock<CardBlock> = {
         id: 'card1.id',
         __typename: 'CardBlock',
@@ -376,16 +416,20 @@ describe('Card', () => {
       }
       const { getByText } = render(
         <MockedProvider>
-          <ThemeProvider>
-            <EditorProvider>
-              <Drawer />
-              <Card {...card} />
-            </EditorProvider>
-          </ThemeProvider>
+          <SnackbarProvider>
+            <ThemeProvider>
+              <EditorProvider>
+                <Card {...card} />
+                <TestEditorState />
+              </EditorProvider>
+            </ThemeProvider>
+          </SnackbarProvider>
         </MockedProvider>
       )
-      fireEvent.click(getByText('Light'))
-      expect(getByText('Card Style Property')).toBeInTheDocument()
+      fireEvent.click(getByText('Style'))
+      expect(
+        getByText('selectedAttributeId: card1.id-theme-mode')
+      ).toBeInTheDocument()
     })
   })
 
@@ -403,7 +447,13 @@ describe('Card', () => {
         fullscreen: true,
         children: []
       }
-      const { getByText } = render(<Card {...card} />)
+      const { getByText } = render(
+        <MockedProvider>
+          <SnackbarProvider>
+            <Card {...card} />
+          </SnackbarProvider>
+        </MockedProvider>
+      )
       expect(getByText('Expanded')).toBeInTheDocument()
     })
 
@@ -422,16 +472,20 @@ describe('Card', () => {
       }
       const { getByText } = render(
         <MockedProvider>
-          <ThemeProvider>
-            <EditorProvider>
-              <Drawer />
-              <Card {...card} />
-            </EditorProvider>
-          </ThemeProvider>
+          <SnackbarProvider>
+            <ThemeProvider>
+              <EditorProvider>
+                <Card {...card} />
+                <TestEditorState />
+              </EditorProvider>
+            </ThemeProvider>
+          </SnackbarProvider>
         </MockedProvider>
       )
-      fireEvent.click(getByText('Contained'))
-      expect(getByText('Card Layout Property')).toBeInTheDocument()
+      fireEvent.click(getByText('Layout'))
+      expect(
+        getByText('selectedAttributeId: card1.id-fullscreen')
+      ).toBeInTheDocument()
     })
   })
 })

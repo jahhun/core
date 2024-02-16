@@ -51,28 +51,32 @@ describe('Footer', () => {
 
   it('should display Footer attributes', () => {
     const { getByText } = render(
-      <JourneyProvider
-        value={{
-          journey: {
-            id: 'journeyId',
-            chatButtons: [
-              {
-                id: '1',
-                link: 'https://m.me/user',
-                platform: ChatPlatform.facebook
-              },
-              {
-                id: '2',
-                link: 'viber://',
-                platform: ChatPlatform.viber
-              }
-            ]
-          } as unknown as Journey,
-          variant: 'admin'
-        }}
-      >
-        <Footer />
-      </JourneyProvider>
+      <MockedProvider>
+        <SnackbarProvider>
+          <JourneyProvider
+            value={{
+              journey: {
+                id: 'journeyId',
+                chatButtons: [
+                  {
+                    id: '1',
+                    link: 'https://m.me/user',
+                    platform: ChatPlatform.facebook
+                  },
+                  {
+                    id: '2',
+                    link: 'viber://',
+                    platform: ChatPlatform.viber
+                  }
+                ]
+              } as unknown as Journey,
+              variant: 'admin'
+            }}
+          >
+            <Footer />
+          </JourneyProvider>
+        </SnackbarProvider>
+      </MockedProvider>
     )
 
     // expect(getByText('Hosted by')).toBeInTheDocument()

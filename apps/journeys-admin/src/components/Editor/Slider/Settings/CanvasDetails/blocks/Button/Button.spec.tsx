@@ -1,13 +1,16 @@
+import { MockedProvider } from '@apollo/client/testing'
 import { render } from '@testing-library/react'
 
 import type { TreeBlock } from '@core/journeys/ui/block'
 import {
   ActiveContent,
   ActiveFab,
-  EditorState,
-  useEditor
+  EditorState
 } from '@core/journeys/ui/EditorProvider'
-import { ActiveSlide } from '@core/journeys/ui/EditorProvider/EditorProvider'
+import {
+  ActiveSlide,
+  EditorProvider
+} from '@core/journeys/ui/EditorProvider/EditorProvider'
 
 import { BlockFields_ButtonBlock as ButtonBlock } from '../../../../../../../../__generated__/BlockFields'
 import {
@@ -18,19 +21,9 @@ import {
   IconName,
   IconSize
 } from '../../../../../../../../__generated__/globalTypes'
+import { TestEditorState } from '../../../../../../../libs/TestEditorState'
 
 import { Button } from '.'
-
-jest.mock('@core/journeys/ui/EditorProvider', () => {
-  const originalModule = jest.requireActual('@core/journeys/ui/EditorProvider')
-  return {
-    __esModule: true,
-    ...originalModule,
-    useEditor: jest.fn()
-  }
-})
-
-const mockUseEditor = useEditor as jest.MockedFunction<typeof useEditor>
 
 describe('Button attributes', () => {
   const block: TreeBlock<ButtonBlock> = {
@@ -47,22 +40,22 @@ describe('Button attributes', () => {
     action: null,
     children: []
   }
-  const state: EditorState = {
-    steps: [],
-    activeFab: ActiveFab.Add,
-    activeSlide: ActiveSlide.JourneyFlow,
-    activeContent: ActiveContent.Canvas
-  }
-
-  beforeEach(() => {
-    mockUseEditor.mockReturnValue({
-      state,
-      dispatch: jest.fn()
-    })
-  })
+  // const state: EditorState = {
+  //   steps: [],
+  //   activeFab: ActiveFab.Add,
+  //   activeSlide: ActiveSlide.JourneyFlow,
+  //   activeContent: ActiveContent.Canvas
+  // }
 
   it('shows default button', () => {
-    const { getByRole } = render(<Button {...block} />)
+    const { getByRole } = render(
+      <MockedProvider>
+        {/* <EditorProvider initialState={state}> */}
+        <EditorProvider>
+          <Button {...block} />
+        </EditorProvider>
+      </MockedProvider>
+    )
     expect(getByRole('button', { name: 'Action None' })).toBeInTheDocument()
     expect(getByRole('button', { name: 'Color Primary' })).toBeInTheDocument()
     expect(
@@ -116,7 +109,14 @@ describe('Button attributes', () => {
         }
       ]
     }
-    const { getByRole } = render(<Button {...filledBlock} />)
+    const { getByRole } = render(
+      <MockedProvider>
+        <EditorProvider>
+          <Button {...filledBlock} />
+          <TestEditorState />
+        </EditorProvider>
+      </MockedProvider>
+    )
     expect(
       getByRole('button', { name: 'Action Selected Card' })
     ).toBeInTheDocument()
@@ -133,16 +133,17 @@ describe('Button attributes', () => {
     ).toBeInTheDocument()
   })
 
-  it('should open property drawer for action', () => {
-    const dispatch = jest.fn()
-    mockUseEditor.mockReturnValue({
-      state,
-      dispatch
-    })
-    render(<Button {...block} />)
-    expect(dispatch).toHaveBeenCalledWith({
-      type: 'SetSelectedAttributeIdAction',
-      selectedAttributeId: 'button.id-button-action'
-    })
+  it('should open attribute for action', () => {
+    const { getByText } = render(
+      <MockedProvider>
+        <EditorProvider>
+          <Button {...block} />
+          <TestEditorState />
+        </EditorProvider>
+      </MockedProvider>
+    )
+    expect(
+      getByText('selectedAttributeId: button.id-button-action')
+    ).toBeInTheDocument()
   })
 })
