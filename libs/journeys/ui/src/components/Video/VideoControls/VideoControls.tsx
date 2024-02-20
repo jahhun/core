@@ -15,7 +15,14 @@ import Slider from '@mui/material/Slider'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import fscreen from 'fscreen'
-import { MouseEventHandler, ReactElement, useEffect, useState } from 'react'
+import {
+  MouseEventHandler,
+  ReactElement,
+  ReactNode,
+  useEffect,
+  useReducer,
+  useState
+} from 'react'
 import Player from 'video.js/dist/types/player'
 
 import { secondsToTimeFormat } from '@core/shared/ui/timeFormat'
@@ -43,7 +50,7 @@ export function VideoControls({
   endAt,
   isYoutube = false,
   loading = false,
-  muted: mute = false
+  muted: initialMuted = false
 }: VideoControlProps): ReactElement {
   const [playing, setPlaying] = useState(false)
   const [active, setActive] = useState(true)
@@ -51,7 +58,11 @@ export function VideoControls({
   const [progress, setProgress] = useState(0)
   const [volume, setVolume] = useState((player.volume() ?? 1) * 100)
   // Explicit muted state since player.muted state lags when video paused
-  const [muted, setMuted] = useState(mute)
+  const [muted, setMuted] = useState(initialMuted)
+  const [state, dispatch] = useReducer(reducer, {
+    muted: initialMuted,
+    playing: false
+  })
   // Explicit fullscreen state since player.fullscreen state lags when video paused
   const [fullscreen, setFullscreen] = useState(
     fscreen.fullscreenElement != null || (player.isFullscreen() ?? false)
@@ -72,6 +83,37 @@ export function VideoControls({
 
   const visible = !playing || active || loading
 
+  function reducer(state, action) {
+    console.log('reducer', state, action)
+    switch (action.type) {
+      case 'mute':
+        console.log('mute called')
+        return { ...state, muted: true }
+      case 'unmute':
+        return { ...state, muted: false }
+      case 'play':
+        return {
+          ...state,
+          playing: true
+        }
+      case 'pause':
+        return {
+          ...state,
+          playing: false
+        }
+      case 'loading':
+        return {
+          ...state,
+          loading: action.payload
+        }
+      case 'active':
+        return {
+          ...state,
+          active: action.payload
+        }
+    }
+  }
+
   // Hide navigation when invisible, show navigation when paused or active
   useEffect(() => {
     if (showNavigation && !visible) {
@@ -83,10 +125,13 @@ export function VideoControls({
   useEffect(() => {
     const handleVideoPlay = (): void => {
       // Always mute first video
+      console.log(player.muted())
       if (player.muted() ?? false) {
         setMuted(true)
+        dispatch({ type: 'mute' })
       }
       setPlaying(true)
+      dispatch({ type: 'play' })
       if (startAt > 0 && (player.currentTime() ?? 0) < startAt) {
         setProgress(startAt)
       }
@@ -203,15 +248,30 @@ export function VideoControls({
   }, [player, isYoutube, playing, setShowHeaderFooter, setShowNavigation])
 
   function handlePlay(): void {
-    if (!playing) {
-      void player.play()
-      // Youtube breaks when this is gone
-      setPlaying(true)
+    console.log('handlePlay')
+    if (state.muted) {
+      dispatch({ type: 'unmute' })
     } else {
-      void player.pause()
-      setPlaying(false)
-      setShowNavigation(true)
+      if (!playing) {
+        void player.play()
+        setPlaying(true)
+        dispatch({ type: 'play' })
+      } else {
+        void player.pause()
+        setPlaying(false)
+        dispatch({ type: 'pause' })
+        setShowNavigation(true)
+      }
     }
+    // if (!playing) {
+    //   // void player.play()
+    //   // Youtube breaks when this is gone
+    //   setPlaying(true)
+    // } else {
+    //   // void player.pause()
+    //   setPlaying(false)
+    //   setShowNavigation(true)
+    // }
   }
 
   function handleFullscreen(): void {
@@ -275,6 +335,19 @@ export function VideoControls({
         timeoutID = undefined
         onDblClick(event)
       }
+    }
+  }
+
+  function renderIcon(): ReactNode {
+    console.log(state)
+    if (state.muted) {
+      return <VolumeOffOutlined fontSize="inherit" />
+    } else {
+      return state.playing ? (
+        <PauseRounded fontSize="inherit" />
+      ) : (
+        <PlayArrowRounded fontSize="inherit" />
+      )
     }
   }
 
@@ -354,11 +427,12 @@ export function VideoControls({
                   p: { xs: 2, sm: 0, md: 2 }
                 }}
               >
-                {playing ? (
+                {renderIcon()}
+                {/* {playing ? (
                   <PauseRounded fontSize="inherit" />
                 ) : (
                   <PlayArrowRounded fontSize="inherit" />
-                )}
+                )} */}
               </IconButton>
             ) : (
               <CircularProgress size={65} />
