@@ -88,6 +88,7 @@ export function VideoControls({
     switch (action.type) {
       case 'mute':
         console.log('mute called')
+        player.muted(!muted)
         return { ...state, muted: true }
       case 'unmute':
         return { ...state, muted: false }
@@ -125,7 +126,7 @@ export function VideoControls({
   useEffect(() => {
     const handleVideoPlay = (): void => {
       // Always mute first video
-      console.log(player.muted())
+      console.log('player muted', player.muted())
       if (player.muted() ?? false) {
         setMuted(true)
         dispatch({ type: 'mute' })
