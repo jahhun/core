@@ -19,6 +19,7 @@ import {
   MouseEventHandler,
   ReactElement,
   ReactNode,
+  useCallback,
   useEffect,
   useReducer,
   useState
@@ -59,20 +60,24 @@ export function VideoControls({
   const [volume, setVolume] = useState((player.volume() ?? 1) * 100)
   // Explicit muted state since player.muted state lags when video paused
   const [muted, setMuted] = useState(initialMuted)
-  const [state, dispatch] = useReducer(reducer, {
-    muted: initialMuted,
-    playing: false
-  })
-  // Explicit fullscreen state since player.fullscreen state lags when video paused
-  const [fullscreen, setFullscreen] = useState(
-    fscreen.fullscreenElement != null || (player.isFullscreen() ?? false)
-  )
+
   const {
     showHeaderFooter,
     setShowHeaderFooter,
     showNavigation,
     setShowNavigation
   } = useBlocks()
+
+  const [state, dispatch] = useReducer(playbackMachine, {
+    muted: initialMuted,
+    playing: false,
+    component: <PlayArrowRounded fontSize="inherit" />,
+    action: 'play'
+  })
+  // Explicit fullscreen state since player.fullscreen state lags when video paused
+  const [fullscreen, setFullscreen] = useState(
+    fscreen.fullscreenElement != null || (player.isFullscreen() ?? false)
+  )
 
   // EndAt could be 0 if player not yet initialised
   const durationSeconds = endAt - startAt
@@ -83,37 +88,53 @@ export function VideoControls({
 
   const visible = !playing || active || loading
 
-  function reducer(state, action) {
-    console.log('reducer', state, action)
-    switch (action.type) {
-      case 'mute':
-        console.log('mute called')
-        player.muted(!muted)
-        return { ...state, muted: true }
-      case 'unmute':
-        return { ...state, muted: false }
+  function playbackMachine(state, event) {
+    switch (event.type) {
+      case 'loading':
+        return state
       case 'play':
-        return {
-          ...state,
-          playing: true
+        void player.play()
+
+        if (state.muted) {
+          return {
+            playing: true,
+            muted: player.muted() ?? false,
+            component: <VolumeOffOutlined fontSize="inherit" />,
+            action: 'unmute'
+          }
+        } else {
+          return {
+            playing: true,
+            muted: false,
+            component: <PauseRounded fontSize="inherit" />,
+            action: 'pause'
+          }
         }
       case 'pause':
+        void player.pause()
+        setShowNavigation(true)
+
         return {
           ...state,
-          playing: false
+          playing: false,
+          component: <PlayArrowRounded fontSize="inherit" />,
+          action: 'play'
         }
-      case 'loading':
+      case 'mute':
+        player.muted(true)
+        return { ...state, muted: true }
+      case 'unmute':
+        void player.muted(false)
         return {
-          ...state,
-          loading: action.payload
-        }
-      case 'active':
-        return {
-          ...state,
-          active: action.payload
+          playing: true,
+          muted: false,
+          component: <PauseRounded fontSize="inherit" />,
+          action: 'pause'
         }
     }
   }
+
+  console.log(state)
 
   // Hide navigation when invisible, show navigation when paused or active
   useEffect(() => {
@@ -126,11 +147,10 @@ export function VideoControls({
   useEffect(() => {
     const handleVideoPlay = (): void => {
       // Always mute first video
-      console.log('player muted', player.muted())
-      if (player.muted() ?? false) {
-        setMuted(true)
-        dispatch({ type: 'mute' })
-      }
+      // if (player.muted() ?? false) {
+      //   setMuted(true)
+      //   // dispatch({ type: 'mute' })
+      // }
       setPlaying(true)
       dispatch({ type: 'play' })
       if (startAt > 0 && (player.currentTime() ?? 0) < startAt) {
@@ -250,7 +270,8 @@ export function VideoControls({
 
   function handlePlay(): void {
     console.log('handlePlay')
-    if (state.muted) {
+    if (muted) {
+      setMuted(false)
       dispatch({ type: 'unmute' })
     } else {
       if (!playing) {
@@ -274,6 +295,8 @@ export function VideoControls({
     //   setShowNavigation(true)
     // }
   }
+
+  const handleTransition = () => dispatch({ type: state.action })
 
   function handleFullscreen(): void {
     if (fullscreen) {
@@ -340,17 +363,18 @@ export function VideoControls({
   }
 
   function renderIcon(): ReactNode {
-    console.log(state)
-    if (state.muted) {
+    if (!playing) {
+      return <PlayArrowRounded fontSize="inherit" />
+    }
+    if (muted) {
       return <VolumeOffOutlined fontSize="inherit" />
-    } else {
-      return state.playing ? (
-        <PauseRounded fontSize="inherit" />
-      ) : (
-        <PlayArrowRounded fontSize="inherit" />
-      )
+    }
+    if (playing) {
+      return <PauseRounded fontSize="inherit" />
     }
   }
+
+  console.log(state.action)
 
   return (
     <Box
@@ -368,7 +392,7 @@ export function VideoControls({
         userSelect: 'none',
         WebkitUserSelect: 'none'
       }}
-      onClick={getClickHandler(handlePlay, handleFullscreen)}
+      onClick={getClickHandler(handleTransition, handleFullscreen)}
       onMouseMove={() => player.userActive(true)}
       onTouchEnd={(e) => {
         const target = e.target as Element
@@ -428,7 +452,7 @@ export function VideoControls({
                   p: { xs: 2, sm: 0, md: 2 }
                 }}
               >
-                {renderIcon()}
+                {state.component}
                 {/* {playing ? (
                   <PauseRounded fontSize="inherit" />
                 ) : (
