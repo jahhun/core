@@ -56,8 +56,6 @@ export function Video(
   const [player, setPlayer] = useState<Player>()
   const hundredVh = use100vh()
 
-  console.log(props)
-
   const {
     id: blockId,
     video,
@@ -75,6 +73,7 @@ export function Video(
     objectFit,
     activeStep
   } = props
+  console.log(activeStep)
 
   const {
     state: { selectedBlock }
