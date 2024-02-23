@@ -73,7 +73,6 @@ export function Video(
     objectFit,
     activeStep
   } = props
-  console.log(activeStep)
 
   const {
     state: { selectedBlock }

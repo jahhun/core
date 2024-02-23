@@ -69,22 +69,30 @@ function playbackMachine(
   state: PlaybackState,
   event: PlaybackEvent
 ): PlaybackState {
+  console.log(event.type, state)
   const s: { [key: string]: PlaybackState } = {
     play: {
       ...state,
       playing: true,
-      action: state.muted ? 'unmute' : 'pause'
+      // Needs mobile conditional
+      mobileAction: state.muted ? 'unmute' : 'pause',
+      desktopAction: 'pause'
     },
-    pause: { ...state, playing: false, action: 'play' },
+    pause: {
+      ...state,
+      playing: false,
+      mobileAction: 'play',
+      desktopAction: 'play'
+    },
     mute: {
       ...state,
       muted: true,
-      action: state.playing ? 'unmute' : 'play'
+      mobileAction: state.playing ? 'unmute' : 'play'
     },
     unmute: {
       ...state,
       muted: false,
-      action: state.playing ? 'pause' : 'play'
+      mobileAction: state.playing ? 'pause' : 'play'
     }
   }
 
@@ -288,13 +296,23 @@ export function VideoControls({
   }
 
   const handleTransition = (): void => {
-    if (isMobile && muted) {
-      handleMute()
-      // void player.muted(false)
-      // dispatch({ type: 'unmute' })
-    } else {
-      handlePlay()
+    const action = isMobile ? state.mobileAction : state.desktopAction;
+
+    const actions = {
+      play: handlePlay,
+      pause: handlePlay,
+      mute: handleMute,
+      unmute: handleMute,
     }
+
+    actions[action]()
+    // if (isMobile && muted) {
+    //   handleMute()
+    //   // void player.muted(false)
+    //   // dispatch({ type: 'unmute' })
+    // } else {
+    //   handlePlay()
+    // }
   }
 
   function handleFullscreen(): void {
@@ -370,7 +388,7 @@ export function VideoControls({
       unmute: <VolumeOffOutlined fontSize="inherit" />
     }
 
-    return icons[state.action]
+    return icons[state.mobileAction]
   }
 
   console.log(state)
