@@ -31,23 +31,20 @@ import { secondsToTimeFormat } from '@core/shared/ui/timeFormat'
 
 import { useBlocks } from '../../../libs/block'
 
-// enum PlaybackAction {
-//   PLAY,
-//   PAUSE,
-//   MUTE,
-//   UNMUTE
-// }
+enum PlaybackEvent {
+  PLAY,
+  PAUSE,
+  MUTE,
+  UNMUTE
+}
 
-type PlaybackAction = 'play' | 'pause' | 'mute' | 'unmute'
+type MobileAction = 'play' | 'pause' | 'unmute'
+// type PlaybackEvent = 'play' | 'pause' | 'mute' | 'unmute'
 
 interface PlaybackState {
   playing: boolean
   muted: boolean
-  action: PlaybackAction
-}
-
-interface PlaybackEvent {
-  type: PlaybackAction
+  action: MobileAction
 }
 
 interface VideoControlProps {
@@ -67,36 +64,34 @@ function isIOS(): boolean {
 
 function playbackMachine(
   state: PlaybackState,
-  event: PlaybackEvent
+  event: { type: PlaybackEvent }
 ): PlaybackState {
-  console.log(event.type, state)
-  const s: { [key: string]: PlaybackState } = {
-    play: {
-      ...state,
-      playing: true,
-      // Needs mobile conditional
-      mobileAction: state.muted ? 'unmute' : 'pause',
-      desktopAction: 'pause'
-    },
-    pause: {
-      ...state,
-      playing: false,
-      mobileAction: 'play',
-      desktopAction: 'play'
-    },
-    mute: {
-      ...state,
-      muted: true,
-      mobileAction: state.playing ? 'unmute' : 'play'
-    },
-    unmute: {
-      ...state,
-      muted: false,
-      mobileAction: state.playing ? 'pause' : 'play'
-    }
+  switch (event.type) {
+    case PlaybackEvent.PLAY:
+      return {
+        ...state,
+        playing: true,
+        action: state.muted ? 'unmute' : 'pause'
+      }
+    case PlaybackEvent.PAUSE:
+      return {
+        ...state,
+        playing: false,
+        action: 'play'
+      }
+    case PlaybackEvent.MUTE:
+      return {
+        ...state,
+        muted: true,
+        action: state.playing ? 'unmute' : 'play'
+      }
+    case PlaybackEvent.UNMUTE:
+      return {
+        ...state,
+        muted: false,
+        action: state.playing ? 'pause' : 'play'
+      }
   }
-
-  return s[event.type]
 }
 
 export function VideoControls({
@@ -107,13 +102,18 @@ export function VideoControls({
   loading = false,
   muted: initialMuted = false
 }: VideoControlProps): ReactElement {
-  const [playing, setPlaying] = useState(false)
   const [active, setActive] = useState(true)
   const [displayTime, setDisplayTime] = useState('0:00')
   const [progress, setProgress] = useState(0)
   const [volume, setVolume] = useState((player.volume() ?? 1) * 100)
-  // Explicit muted state since player.muted state lags when video paused
-  const [muted, setMuted] = useState(initialMuted)
+  const [state, dispatch] = useReducer(playbackMachine, {
+    // Explicit muted state since player.muted state lags when video paused
+    muted: initialMuted,
+    playing: false,
+    action: 'play'
+  })
+
+  const theme = useTheme()
 
   const {
     showHeaderFooter,
@@ -121,18 +121,11 @@ export function VideoControls({
     showNavigation,
     setShowNavigation
   } = useBlocks()
-  const theme = useTheme()
 
   const isMobile = useMediaQuery(
     `(max-width:${theme.breakpoints.values.lg - 0.5}px)`
   )
 
-  const [state, dispatch] = useReducer(playbackMachine, {
-    muted: initialMuted,
-    playing: false,
-    action: 'play'
-    // action: PlaybackTransition.PLAY
-  })
   // Explicit fullscreen state since player.fullscreen state lags when video paused
   const [fullscreen, setFullscreen] = useState(
     fscreen.fullscreenElement != null || (player.isFullscreen() ?? false)
@@ -145,7 +138,7 @@ export function VideoControls({
       ? null
       : secondsToTimeFormat(durationSeconds, { trimZeroes: true })
 
-  const visible = !playing || active || loading
+  const visible = !state.playing || active || loading
 
   // Hide navigation when invisible, show navigation when paused or active
   useEffect(() => {
@@ -159,13 +152,10 @@ export function VideoControls({
     const handleVideoPlay = (): void => {
       // Always mute first video
       if (player.muted() ?? false) {
-        console.log('muting first video')
-        setMuted(true)
-        dispatch({ type: 'mute' })
+        dispatch({ type: PlaybackEvent.MUTE })
       }
-      setPlaying(true)
       void player.play()
-      dispatch({ type: 'play' })
+      dispatch({ type: PlaybackEvent.PLAY })
       if (startAt > 0 && (player.currentTime() ?? 0) < startAt) {
         setProgress(startAt)
       }
@@ -187,7 +177,7 @@ export function VideoControls({
   // Handle pause event
   useEffect(() => {
     const handleVideoPause = (): void => {
-      setPlaying(false)
+      dispatch({ type: PlaybackEvent.PAUSE })
 
       const videoHasClashingUI = isYoutube && (player.userActive() ?? true)
       if (videoHasClashingUI) {
@@ -259,7 +249,7 @@ export function VideoControls({
       setFullscreen(fullscreen)
 
       const videoHasClashingUI =
-        isYoutube && !playing && (player.userActive() ?? true)
+        isYoutube && !state.playing && (player.userActive() ?? true)
       if (videoHasClashingUI) {
         setShowHeaderFooter(false)
       } else {
@@ -282,37 +272,29 @@ export function VideoControls({
   }, [player, isYoutube, state, setShowHeaderFooter, setShowNavigation])
 
   function handlePlay(): void {
-    if (!playing) {
+    if (!state.playing) {
       void player.play()
       // Youtube breaks when this is gone
-      setPlaying(true)
-      dispatch({ type: 'play' })
+      dispatch({ type: PlaybackEvent.PLAY })
     } else {
       void player.pause()
-      setPlaying(false)
       setShowNavigation(true)
-      dispatch({ type: 'pause' })
+      dispatch({ type: PlaybackEvent.PAUSE })
     }
   }
 
-  const handleTransition = (): void => {
-    const action = isMobile ? state.mobileAction : state.desktopAction;
+  const handlePlaybackEvent = (): void => {
+    if (!isMobile) {
+      handlePlay()
+    } else {
+      const mobileActions = {
+        play: handlePlay,
+        pause: handlePlay,
+        unmute: handleMute
+      }
 
-    const actions = {
-      play: handlePlay,
-      pause: handlePlay,
-      mute: handleMute,
-      unmute: handleMute,
+      mobileActions[state.action]()
     }
-
-    actions[action]()
-    // if (isMobile && muted) {
-    //   handleMute()
-    //   // void player.muted(false)
-    //   // dispatch({ type: 'unmute' })
-    // } else {
-    //   handlePlay()
-    // }
   }
 
   function handleFullscreen(): void {
@@ -343,20 +325,25 @@ export function VideoControls({
     }
   }
 
-  function handleMute(e?: any): void {
-    e?.stopPropagation()
-
-    state.muted ? dispatch({ type: 'unmute' }) : dispatch({ type: 'mute' })
-    setMuted(!muted)
-    player.muted(!muted)
+  function handleMute(): void {
+    player.muted(!state.muted)
+    state.muted
+      ? dispatch({ type: PlaybackEvent.UNMUTE })
+      : dispatch({ type: PlaybackEvent.MUTE })
   }
 
   function handleVolume(e: Event, value: number | number[]): void {
     if (!Array.isArray(value)) {
-      player.muted(false)
-      setMuted(false)
-      setVolume(value)
-      player.volume(value / 100)
+      if (value > 0) {
+        player.muted(false)
+        dispatch({ type: PlaybackEvent.UNMUTE })
+        setVolume(value)
+        player.volume(value / 100)
+      } else {
+        player.muted(true)
+        dispatch({ type: PlaybackEvent.MUTE })
+        setVolume(0)
+      }
     }
   }
 
@@ -388,10 +375,8 @@ export function VideoControls({
       unmute: <VolumeOffOutlined fontSize="inherit" />
     }
 
-    return icons[state.mobileAction]
+    return icons[state.action]
   }
-
-  console.log(state)
 
   return (
     <Box
@@ -399,7 +384,6 @@ export function VideoControls({
       role="region"
       dir="ltr"
       sx={{
-        border: '3px solid red',
         position: 'absolute',
         zIndex: 1000,
         top: 0,
@@ -410,7 +394,7 @@ export function VideoControls({
         userSelect: 'none',
         WebkitUserSelect: 'none'
       }}
-      onClick={getClickHandler(handleTransition, handleFullscreen)}
+      onClick={getClickHandler(handlePlaybackEvent, handleFullscreen)}
       onMouseMove={() => player.userActive(true)}
       onTouchEnd={(e) => {
         const target = e.target as Element
@@ -424,7 +408,7 @@ export function VideoControls({
         // iOS: pause video on first click, default just shows controls.
         if (controlsHidden && videoControlsNotClicked && isIOS()) {
           void player.pause()
-          setPlaying(false)
+          dispatch({ type: PlaybackEvent.PAUSE })
         }
         player.userActive(true)
       }}
@@ -436,34 +420,11 @@ export function VideoControls({
         timeout={{ exit: 3000 }}
       >
         <Stack justifyContent="flex-end" sx={{ height: '100%' }}>
-          {/* Mute / Unmute */}
-          <Stack
-            flexDirection="row"
-            justifyContent="flex-end"
-            sx={{ mt: 15, display: { lg: 'none' } }}
-          >
-            <IconButton
-              aria-label="mute"
-              sx={{
-                mx: 4,
-                mt: 1,
-                backgroundColor: '#ffffff29',
-                ':hover': {
-                  background: '#ffffff3d'
-                }
-              }}
-              onClick={handleMute}
-            >
-              {muted ? <VolumeOffOutlined /> : <VolumeUpOutlined />}
-            </IconButton>
-          </Stack>
-          {/* Play/Pause */}
+          {/* Mobile Play/Pause/Mute */}
           <Stack flexGrow={1} alignItems="center" justifyContent="center">
             {!loading ? (
               <IconButton
-                aria-label={
-                  playing ? 'center-pause-button' : 'center-play-button'
-                }
+                aria-label={`center-${state.action}-button`}
                 sx={{
                   fontSize: 50,
                   display: { xs: 'flex', lg: 'none' },
@@ -482,7 +443,6 @@ export function VideoControls({
             data-testid="vjs-jfp-custom-controls"
             maxWidth="xxl"
             sx={{
-              border: '3px solid blue',
               zIndex: 1,
               transitionDelay: visible ? undefined : '0.5s',
               pb: {
@@ -500,14 +460,16 @@ export function VideoControls({
               alignItems="center"
             >
               <IconButton
-                aria-label={playing ? 'bar-pause-button' : 'bar-play-button'}
+                aria-label={
+                  state.playing ? 'bar-pause-button' : 'bar-play-button'
+                }
                 onClick={handlePlay}
                 sx={{
                   display: { xs: 'none', lg: 'flex' },
                   ml: { xs: 0, lg: -1 }
                 }}
               >
-                {!playing ? <PlayArrowRounded /> : <PauseRounded />}
+                {!state.playing ? <PlayArrowRounded /> : <PauseRounded />}
               </IconButton>
               <Slider
                 aria-label="desktop-progress-control"
@@ -591,8 +553,14 @@ export function VideoControls({
                       }
                     }}
                   />
-                  <IconButton onClick={handleMute} sx={{ p: 0 }}>
-                    {muted || volume === 0 ? (
+                  <IconButton
+                    aria-label={
+                      state.muted ? 'bar-unmute-button' : 'bar-mute-button'
+                    }
+                    onClick={handleMute}
+                    sx={{ p: 0 }}
+                  >
+                    {state.muted || volume === 0 ? (
                       <VolumeOffOutlined />
                     ) : volume > 60 ? (
                       <VolumeUpOutlined />
