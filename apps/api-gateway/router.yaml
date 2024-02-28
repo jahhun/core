@@ -5,6 +5,7 @@ cors:
   match_origins:
     # any localhost
     - '^http://localhost:\d+$'
+    - '^https:\/\/[a-zA-Z0-9-]+\.ngrok-free.app'
   max_age: 24h
 headers:
   all:
