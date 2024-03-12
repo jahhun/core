@@ -308,6 +308,21 @@ function transformSteps(steps: Array<TreeBlock<StepBlock>>): {
   return { nodes, edges }
 }
 
+const nodeTypes = {
+  RadioOptionBlock: RadioOptionBlockNode,
+  StepBlock: StepBlockNode,
+  ButtonBlock: ButtonBlockNode,
+  TextResponseBlock: TextResponseBlockNode,
+  SignUpBlock: SignUpBlockNode,
+  FormBlock: FormBlockNode,
+  VideoBlock: VideoBlockNode,
+  SocialPreview: SocialPreviewNode
+}
+
+const edgeTypes = {
+  smart: SmartBezierEdge
+}
+
 export function JourneyFlow(): ReactElement {
   const {
     state: { steps }
@@ -316,9 +331,6 @@ export function JourneyFlow(): ReactElement {
   const [nodes, setNodes] = useNodesState([])
   const [edges, setEdges] = useEdgesState([])
   const [previousNodeId, setPreviousNodeId] = useState<string | null>(null)
-  const edgeTypes = {
-    smart: SmartBezierEdge
-  }
 
   useEffect(() => {
     const { nodes, edges } = transformSteps(steps ?? [])
@@ -399,16 +411,7 @@ export function JourneyFlow(): ReactElement {
         onConnectEnd={onConnectEnd}
         onConnectStart={onConnectStart}
         fitView
-        nodeTypes={{
-          RadioOptionBlock: RadioOptionBlockNode,
-          StepBlock: StepBlockNode,
-          ButtonBlock: ButtonBlockNode,
-          TextResponseBlock: TextResponseBlockNode,
-          SignUpBlock: SignUpBlockNode,
-          FormBlock: FormBlockNode,
-          VideoBlock: VideoBlockNode,
-          SocialPreview: SocialPreviewNode
-        }}
+        nodeTypes={nodeTypes}
         proOptions={{ hideAttribution: true }}
       >
         <Controls showInteractive={false} />
