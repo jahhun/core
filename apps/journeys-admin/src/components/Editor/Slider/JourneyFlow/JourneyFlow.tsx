@@ -271,10 +271,14 @@ function transformSteps(steps: Array<TreeBlock<StepBlock>>): {
   const step = getStepFromId(steps[0]?.id)
   if (step != null) processSteps([step])
 
+  console.log(blocks)
+
   blocks.forEach((row, index) => {
     const stepY = index * (STEP_NODE_HEIGHT + STEP_NODE_HEIGHT_GAP)
     row.forEach((step, index) => {
       connectBlockToNextBlock({ block: step, step, steps })
+
+      console.log(step)
       const stepX =
         index * (STEP_NODE_WIDTH + STEP_NODE_WIDTH_GAP) -
         (row.length / 2) * (STEP_NODE_WIDTH + STEP_NODE_WIDTH_GAP)

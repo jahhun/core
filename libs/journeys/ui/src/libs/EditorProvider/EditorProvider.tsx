@@ -250,6 +250,8 @@ export function EditorProvider({
     ...initialState
   })
 
+  useEffect(() => console.log(state), [state])
+
   useEffect(() => {
     if (initialState?.steps != null)
       dispatch({ type: 'SetStepsAction', steps: initialState.steps })
