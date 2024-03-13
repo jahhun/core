@@ -1,13 +1,7 @@
 import Box from '@mui/material/Box'
 import { SmartBezierEdge } from '@tisoap/react-flow-smart-edge'
 import findIndex from 'lodash/findIndex'
-import {
-  ReactElement,
-  useCallback,
-  useEffect,
-  useLayoutEffect,
-  useState
-} from 'react'
+import { ReactElement, useEffect, useState } from 'react'
 import {
   Background,
   Controls,
@@ -18,9 +12,7 @@ import {
   OnConnectStart,
   ReactFlow,
   useEdgesState,
-  useNodesState,
-  ReactFlowProvider,
-  useReactFlow
+  useNodesState
 } from 'reactflow'
 import * as d3 from 'd3'
 import { v4 as uuidv4 } from 'uuid'
@@ -118,18 +110,6 @@ function filterActionBlocks(step: TreeBlock<StepBlock>): ActionBlock[] {
     ) as ActionBlock[]
 }
 
-// DON'T move this inside the ReactFlow Component. It is causing an infine rerendering.
-const nodeTypes = {
-  RadioOptionBlock: RadioOptionBlockNode,
-  StepBlock: StepBlockNode,
-  ButtonBlock: ButtonBlockNode,
-  TextResponseBlock: TextResponseBlockNode,
-  SignUpBlock: SignUpBlockNode,
-  FormBlock: FormBlockNode,
-  VideoBlock: VideoBlockNode,
-  SocialPreview: SocialPreviewNode
-}
-
 function transformSteps(steps: Array<TreeBlock<StepBlock>>): {
   nodes: InternalNode[]
   edges: Edge[]
@@ -170,6 +150,7 @@ function transformSteps(steps: Array<TreeBlock<StepBlock>>): {
     const index = findIndex(steps, (child) => child.id === step.id)
     if (index < 0) return
     if (step.nextBlockId == null && steps[index + 1] != null) {
+      console.log('👋', step)
       edges.push({
         id: `${block.id}->${steps[index + 1].id}`,
         source: block.id,
@@ -223,7 +204,7 @@ function transformSteps(steps: Array<TreeBlock<StepBlock>>): {
   }
 
   function processSteps(steps: Array<TreeBlock<StepBlock>>): void {
-    console.log('%c- processSteps - steps', 'color: red', steps)
+    console.log('%cprocessSteps - steps', 'color: red', steps)
 
     // for (const step of steps) {
     //   const actions = filterActionBlocks(step)
@@ -333,11 +314,14 @@ function transformSteps(steps: Array<TreeBlock<StepBlock>>): {
       row.some((block) => block.id === step.id)
     )
     if (!existsInBlocks) {
-      // step['orphan'] = true
+      step['orphan'] = true
       processSteps([step])
-      // console.log('- Step not in blocks:', step)
+      console.log('Step not in blocks:', step)
     }
   })
+
+  // output block in the console log
+  console.log(blocks)
 
   blocks.forEach((row, index) => {
     // Calculate the depth of the step here, replace `depth` with actual calculation
@@ -350,27 +334,28 @@ function transformSteps(steps: Array<TreeBlock<StepBlock>>): {
       currentY += STEP_NODE_HEIGHT + STEP_NODE_HEIGHT_GAP
     }
     const stepY = index * (STEP_NODE_HEIGHT + STEP_NODE_HEIGHT_GAP)
+    console.log('nodes  >>>> ', nodes)
     row.forEach((step, index) => {
       connectBlockToNextBlock({ block: step, step, steps })
       const stepX =
         index * (STEP_NODE_WIDTH + STEP_NODE_WIDTH_GAP) -
         (row.length / 2) * (STEP_NODE_WIDTH + STEP_NODE_WIDTH_GAP)
 
-      // console.log('nodes[step.id]?.position?.x', nodes[step.id]?.position?.x)
+      console.log('nodes[step.id]?.position?.x', nodes[step.id]?.position?.x)
 
       nodes.push({
         id: step.id,
         type: 'StepBlock',
         data: { ...step, steps },
-        draggable: true
+        draggable: true,
         // position: {
         //   x: stepX,
         //   y: stepY
         // }
-        // position: {
-        //   x: 0, // You should calculate X based on the number of nodes at the same level to spread them out
-        //   y: yPosition
-        // }
+        position: {
+          x: 0, // You should calculate X based on the number of nodes at the same level to spread them out
+          y: yPosition
+        }
       })
       const blockY = stepY + STEP_NODE_HEIGHT + ACTION_NODE_HEIGHT_GAP
       const blocks = filterActionBlocks(step)
@@ -392,159 +377,14 @@ function transformSteps(steps: Array<TreeBlock<StepBlock>>): {
   nodes.push({
     type: 'SocialPreview',
     id: 'SocialPreview',
-    // position: { x: -165, y: -195 },
+    position: { x: -165, y: -195 },
     data: { __typename: 'SocialPreview' }
-  })
-
-  simulation.nodes(nodes)
-  console.log('simulation.nodes', simulation.nodes())
-  console.log('edges', edges)
-  simulation.force(
-    'link',
-    d3
-      .forceLink(JSON.parse(JSON.stringify(edges)))
-      .id((d) => d.id)
-      .distance(1500)
-      .strength(1)
-  )
-
-  nodes.forEach((node, index) => {
-    // console.log('🇲🇩 node', node)
-    // node.position = { x: 0, y: 0 }
-    node.position = { x: node?.x || 0, y: node?.y || (index + 1) * 100 }
   })
 
   return { nodes, edges }
 }
 
-export const initialEdges = [
-  { id: 'e1-2', source: '1', target: '2', label: 'this is an edge label' },
-  { id: 'e1-3', source: '1', target: '3' },
-  {
-    id: 'e3-4',
-    source: '3',
-    target: '4',
-    animated: true,
-    label: 'animated edge'
-  },
-  {
-    id: 'e4-5',
-    source: '4',
-    target: '5',
-    label: 'edge with arrow head',
-    markerEnd: {
-      type: MarkerType.ArrowClosed
-    }
-  },
-  {
-    id: 'e5-6',
-    source: '5',
-    target: '6',
-    type: 'smoothstep',
-    label: 'smooth step edge'
-  },
-  {
-    id: 'e5-7',
-    source: '5',
-    target: '7',
-    type: 'step',
-    style: { stroke: '#f6ab6c' },
-    label: 'a step edge',
-    animated: true,
-    labelStyle: { fill: '#f6ab6c', fontWeight: 700 }
-  }
-]
-
-// Compute the graph and start the force simulation.
-// const root = d3.hierarchy({
-//   name: 'Eve',
-//   children: [
-//     { name: 'Cain' },
-//     { name: 'Seth', children: [{ name: 'Enos' }, { name: 'Noam' }] },
-//     { name: 'Abel' },
-//     { name: 'Awan', children: [{ name: 'Enoch' }] },
-//     { name: 'Azura' }
-//   ]
-// })
-// const links = root.links()
-// const d3nodes = root.descendants()
-
-// console.log('d3nodes', d3nodes)
-// const simulation = d3
-//   .forceSimulation(d3nodes)
-//   .force(
-//     'link',
-//     d3
-//       .forceLink(links)
-//       .id((d) => d.id)
-//       .distance(500)
-//       .strength(1)
-//   )
-//   .force('charge', d3.forceManyBody().strength(-50))
-//   .force('x', d3.forceX())
-//   .force('y', d3.forceY())
-
-// const simulation = d3
-//   .forceSimulation([])
-//   .force(
-//     'link',
-//     d3
-//       .forceLink([])
-//       .id((d) => d.id)
-//       .distance(500)
-//       .strength(1)
-//   )
-//   .force('charge', d3.forceManyBody().strength(-50))
-//   .force('x', d3.forceX())
-//   .force('y', d3.forceY())
-
-// simulation.on('tick', () => {
-//   console.log('simulation tick')
-// })
-
-// const simulation = d3.forceSimulation([])
-// simulation.stop()
-
-// console.log(d3nodes)
-
-// export const STEP_NODE_WIDTH = 200
-// export const STEP_NODE_HEIGHT = 76
-// export const STEP_NODE_WIDTH_GAP = 200
-// export const STEP_NODE_HEIGHT_GAP =
-
-const simulation = d3
-  .forceSimulation([])
-  .force('charge', d3.forceManyBody().strength(-300))
-  .force('center', d3.forceCenter(STEP_NODE_WIDTH, STEP_NODE_HEIGHT))
-  .force('collide', d3.forceCollide(STEP_NODE_WIDTH * 1.2))
-
-  // .force(
-  //   'link',
-  //   d3
-  //     .forceLink([])
-  //     .id((d) => d.id)
-  //     .distance(300)
-  //     .strength(1)
-  // )
-
-  .force('x', d3.forceX())
-  .force('y', d3.forceY())
-
-simulation.on('tick', () => {
-  console.log('- simulation tick')
-})
-
-const onInit = (reactFlowInstance) =>
-  console.log('flow loaded:', reactFlowInstance)
-
-function Flow(props) {
-  const edgeTypes = {
-    smart: SmartBezierEdge
-  }
-
-  // you can access the internal state here
-  const reactFlowInstance = useReactFlow()
-
+export function JourneyFlow(): ReactElement {
   const {
     state: { steps }
   } = useEditor()
@@ -552,73 +392,31 @@ function Flow(props) {
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
   const [previousNodeId, setPreviousNodeId] = useState<string | null>(null)
-  const [nodeUpdateTick, setNodeUpdateTick] = useState(0)
-
-  // Calculate the initial layout on mount.
-  // useLayoutEffect(() => {
-  //   console.log('useLayoutEffect')
-  //   // onLayout({ direction: 'DOWN', useInitialNodes: true })
-  // }, [])
-
-  // console.log('%cnodes', 'color: green', nodes)
-
-  const updatedNodesPosition = (nodes) => {
-    nodes.forEach((node) => {
-      node.position = { x: node?.x || 0, y: node?.y || 0 }
-    })
-
-    return nodes
+  const edgeTypes = {
+    smart: SmartBezierEdge
   }
 
   useEffect(() => {
-    // Subscribe to the d3 tick event
-    simulation.on('tick', () => {
-      // simulation.stop()
-      // console.log('⏰ simulation tick', nodes)
-      setNodeUpdateTick((prev) => prev + 1)
-
-      // setNodes(nodes)
-      // nodes.forEach((node) => {
-      //   console.log('%ctick - node update A', 'color: yellow', {
-      //     x: node?.x,
-      //     y: node?.y
-      //   })
-      //   // node.position = { x: node?.x || 0, y: node?.y || 0 }
-      //   node.position = { x: 0, y: 0 }
-      //   console.log('%ctick - node update B', 'color: orange', node.position)
-      // })
-    })
-  }, []) // Empty dependency array means this effect runs once on mount and cleanup on unmount
-
-  useEffect(() => {
-    console.log('⏰ useEffect - nodeUpdateTick')
-    setNodes(updatedNodesPosition(nodes))
-  }, [nodeUpdateTick])
-
-  useEffect(() => {
-    // console.log('useEffect - steps ', steps)
+    console.log('useEffect - steps ', steps)
     const { nodes, edges } = transformSteps(steps ?? [])
-
-    console.log('useEffect - nodes ', { nodes, edges })
-
     setEdges(edges)
-    setNodes(updatedNodesPosition(nodes))
-  }, [])
+    setNodes(nodes)
+  }, [steps, setNodes, setEdges])
 
-  // const onConnectStart: OnConnectStart = (_, { nodeId }) => {
-  //   setPreviousNodeId(nodeId)
-  // }
+  const onConnectStart: OnConnectStart = (_, { nodeId }) => {
+    setPreviousNodeId(nodeId)
+  }
 
-  // const onConnectEnd: OnConnectEnd = (event) => {
-  //   if (
-  //     (event.target as HTMLElement | undefined)?.className ===
-  //       'react-flow__pane' &&
-  //     previousNodeId != null
-  //   ) {
-  //     const nodeData = nodes.find((node) => node.id === previousNodeId)?.data
-  //     void createNewStepAndConnectBlock(nodeData)
-  //   }
-  // }
+  const onConnectEnd: OnConnectEnd = (event) => {
+    if (
+      (event.target as HTMLElement | undefined)?.className ===
+        'react-flow__pane' &&
+      previousNodeId != null
+    ) {
+      const nodeData = nodes.find((node) => node.id === previousNodeId)?.data
+      void createNewStepAndConnectBlock(nodeData)
+    }
+  }
 
   const { journey } = useJourney()
   const [stepAndCardBlockCreate] = useStepAndCardBlockCreateMutation()
@@ -669,45 +467,32 @@ function Flow(props) {
     }
   }
 
-  // useEffect(() => {
-  //   console.log('useEffect - nodes ', nodes)
-  //   nodes.forEach((node) => {
-  //     console.log('⚡️ ⚡️ ⚡️ ⚡️  node', node)
-  //     node.position = { x: node?.x || 0, y: node?.y || 0 }
-  //   })
-
-  //   // const { nodes, edges } = transformSteps(steps ?? [])
-  //   // setEdges(edges)
-  //   // setNodes(nodes)
-  // }, [nodes])
-
-  return (
-    <ReactFlow
-      nodes={nodes}
-      edges={edges}
-      edgeTypes={edgeTypes}
-      // onConnectEnd={onConnectEnd}
-      // onConnectStart={onConnectStart}
-      onNodesChange={onNodesChange}
-      // onEdgesChange={onEdgesChange}
-
-      nodeTypes={nodeTypes}
-      onInit={onInit}
-      fitView
-      proOptions={{ hideAttribution: true }}
-    >
-      <Controls showInteractive={false} />
-      <Background color="#aaa" gap={16} />
-    </ReactFlow>
-  )
-}
-
-export function JourneyFlow(): ReactElement {
   return (
     <Box sx={{ width: '100%', height: '100%' }}>
-      <ReactFlowProvider>
-        <Flow />
-      </ReactFlowProvider>
+      <ReactFlow
+        nodes={nodes}
+        edges={edges}
+        edgeTypes={edgeTypes}
+        onConnectEnd={onConnectEnd}
+        onConnectStart={onConnectStart}
+        // onNodesChange={onNodesChange}
+        // onEdgesChange={onEdgesChange}
+        fitView
+        nodeTypes={{
+          RadioOptionBlock: RadioOptionBlockNode,
+          StepBlock: StepBlockNode,
+          ButtonBlock: ButtonBlockNode,
+          TextResponseBlock: TextResponseBlockNode,
+          SignUpBlock: SignUpBlockNode,
+          FormBlock: FormBlockNode,
+          VideoBlock: VideoBlockNode,
+          SocialPreview: SocialPreviewNode
+        }}
+        proOptions={{ hideAttribution: true }}
+      >
+        <Controls showInteractive={false} />
+        <Background color="#aaa" gap={16} />
+      </ReactFlow>
     </Box>
   )
 }
