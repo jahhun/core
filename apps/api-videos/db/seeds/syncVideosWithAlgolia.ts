@@ -14,68 +14,71 @@ const client = algoliasearch(
 export async function syncVideosWithAlgolia(): Promise<void> {
   console.log('syncing videos to algolia...')
 
-  let offset = 0
-  let nextPage = true
+  const offset = 0
+  const nextPage = true
 
   const startTime = new Date().getTime()
 
-  while (nextPage) {
-    // const videos = await prisma.video.findMany({
-    //   take: 11,
-    //   skip: offset,
-    //   include: { variants: { take: 5 }, title: true }
-    // })
+  const totalRecords = await prisma.videoVariant.count()
 
-    const videoVariants = await prisma.videoVariant.findMany({
-      take: 11,
-      skip: offset,
-      include: {
-        video: { include: { title: true } },
-        subtitle: true
-      }
-    })
+  console.log('totalRecords:', totalRecords)
+  // while (nextPage) {
+  //   // const videos = await prisma.video.findMany({
+  //   //   take: 11,
+  //   //   skip: offset,
+  //   //   include: { variants: { take: 5 }, title: true }
+  //   // })
 
-    // const videoVariants = await prisma.videoVariant.findFirst({
-    //   where: { videoId: '1_jf-0-0' },
-    //   include: {
-    //     video: { include: { title: true } },
-    //     subtitle: true
-    //   }
-    // })
-    // console.log(videoVariants)
+  //   // const videoVariants = await prisma.videoVariant.findMany({
+  //   //   take: 25001,
+  //   //   skip: offset,
+  //   //   include: {
+  //   //     video: { include: { title: true } },
+  //   //     subtitle: true
+  //   //   }
+  //   // })
 
-    const transformedVideos = videoVariants.map((videoVariant) => {
-      return {
-        objectID: videoVariant.id,
-        videoId: videoVariant.videoId,
-        titles: videoVariant.video?.title[0].value,
-        description: (
-          videoVariant.video?.description as unknown as Translation
-        )[0].value,
-        duration: videoVariant.duration,
-        languageId: videoVariant.languageId,
-        subtitles: videoVariant.subtitle.map((subtitle) => subtitle.languageId),
-        slug: videoVariant.slug,
-        label: videoVariant.video?.label,
-        image: videoVariant.video?.image,
-        imageAlt: (videoVariant.video?.imageAlt as unknown as Translation)[0]
-          .value,
-        childrenCount: videoVariant.video?.childIds.length
-      }
-    })
+  //   // // const videoVariants = await prisma.videoVariant.findFirst({
+  //   // //   where: { videoId: '1_jf-0-0' },
+  //   // //   include: {
+  //   // //     video: { include: { title: true } },
+  //   // //     subtitle: true
+  //   // //   }
+  //   // // })
+  //   // // console.log(videoVariants)
 
-    // console.log('transformedVideos:', transformedVideos)
+  //   // const transformedVideos = videoVariants.map((videoVariant) => {
+  //   //   return {
+  //   //     objectID: videoVariant.id,
+  //   //     videoId: videoVariant.videoId,
+  //   //     titles: videoVariant.video?.title[0].value,
+  //   //     description: (
+  //   //       videoVariant.video?.description as unknown as Translation
+  //   //     )[0].value,
+  //   //     duration: videoVariant.duration,
+  //   //     languageId: videoVariant.languageId,
+  //   //     subtitles: videoVariant.subtitle.map((subtitle) => subtitle.languageId),
+  //   //     slug: videoVariant.slug,
+  //   //     label: videoVariant.video?.label,
+  //   //     image: videoVariant.video?.image,
+  //   //     imageAlt: (videoVariant.video?.imageAlt as unknown as Translation)[0]
+  //   //       .value,
+  //   //     childrenCount: videoVariant.video?.childIds.length
+  //   //   }
+  //   // })
 
-    const duration = new Date().getTime() - startTime
-    console.log('syncVideosWithAlgolia duration(s):', duration * 0.001)
-    console.log('syncVideosWithAlgolia page:', offset)
+  //   // console.log('transformedVideos:', transformedVideos)
 
-    // const index = client.initIndex('video-variants')
-    // await index.saveObjects(transformedVideos).wait()
+  //   const duration = new Date().getTime() - startTime
+  //   console.log('syncVideosWithAlgolia duration(s):', duration * 0.001)
+  //   console.log('syncVideosWithAlgolia page:', offset)
 
-    if (videoVariants.length === 11) offset += 10
-    else nextPage = false
-  }
+  //   // const index = client.initIndex('video-variants')
+  //   // await index.saveObjects(transformedVideos).wait()
+
+  //   if (videoVariants.length === 25001) offset += 25000
+  //   else nextPage = false
+  // }
 
   console.log('synced videos to algolia')
 }
