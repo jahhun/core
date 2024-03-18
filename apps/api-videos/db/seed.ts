@@ -51,8 +51,8 @@ async function importMediaComponents(): Promise<void> {
 }
 
 async function main(): Promise<void> {
-  console.log('importing mediaComponents as videos...')
-  await importMediaComponents()
+  // console.log('importing mediaComponents as videos...')
+  // await importMediaComponents()
   console.log('mediaComponents imported')
   await syncVideosWithAlgolia()
 }
