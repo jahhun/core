@@ -10,6 +10,7 @@ import { SwiperOptions } from 'swiper/types'
 
 import { GetJourneys_journeys as Journey } from '../../../__generated__/GetJourneys'
 import { useJourneysQuery } from '../../libs/useJourneysQuery'
+import { CollectionsCarousel } from '../TemplateGallery/CollectionsCarousel'
 import { TemplateGalleryCarousel } from '../TemplateGallery/TemplateGalleryCarousel'
 import { TemplateGalleryCard } from '../TemplateGalleryCard'
 
@@ -86,7 +87,7 @@ export function TemplateSections({
     },
     [breakpoints.values.lg]: {
       slidesPerGroup: 5,
-      spaceBetween: 32
+      spaceBetween: 12
     },
     [breakpoints.values.xl]: {
       slidesPerGroup: 6,
@@ -98,8 +99,20 @@ export function TemplateSections({
     }
   }
 
+  function handleTagIdChange(selectedTagId: string): void {
+    // setSelectedTagIds([selectedTagId])
+    // router.query.tagIds = selectedTagId
+    // void router.push(router)
+  }
+
   return (
-    <Stack spacing={8} data-testid="JourneysAdminTemplateSections">
+    <Stack
+      spacing={8}
+      data-testid="JourneysAdminTemplateSections"
+      sx={{
+        pt: 8
+      }}
+    >
       {tagIds?.length !== 1 &&
         (loading || (collection != null && collection.length > 0)) && (
           <TemplateGalleryCarousel
@@ -109,12 +122,12 @@ export function TemplateSections({
             renderItem={(itemProps) => <TemplateGalleryCard {...itemProps} />}
             breakpoints={swiperBreakpoints}
             loading={loading}
-            slidesOffsetBefore={-8}
-            cardSpacing={{
-              xs: 1,
-              md: 8,
-              xl: 11
-            }}
+            // slidesOffsetBefore={-8}
+            // cardSpacing={{ // Conflicting with spacing set inside the breakpoints
+            //   xs: 1,
+            //   md: 8,
+            //   xl: 11
+            // }}
           />
         )}
       {!loading && collection != null && collection.length === 0 && (
@@ -137,6 +150,7 @@ export function TemplateSections({
           </Typography>
         </Paper>
       )}
+      <CollectionsCarousel onChange={handleTagIdChange} />
       {map(
         contents,
         ({ category, journeys }, key) =>

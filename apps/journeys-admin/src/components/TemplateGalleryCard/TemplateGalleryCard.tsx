@@ -76,10 +76,10 @@ export function TemplateGalleryCard({
         border: 'none',
         backgroundColor: 'transparent',
         cursor: 'pointer',
-        width: { xs: 130, md: 180, xl: 240 },
+        width: { xs: 130, md: 240, xl: 240 },
         borderRadius: 2,
         boxShadow: 'none',
-        p: 2,
+        p: 0,
         transition: (theme) => theme.transitions.create('background-color'),
         '& .MuiImageBackground-root': {
           transition: (theme) => theme.transitions.create('transform')
@@ -111,7 +111,8 @@ export function TemplateGalleryCard({
           sx={{
             height: 'inherit',
             color: 'inherit',
-            textDecoration: 'none'
+            textDecoration: 'none',
+            backgroundColor: 'red'
           }}
         >
           {journey != null ? (
@@ -120,16 +121,29 @@ export function TemplateGalleryCard({
               alignItems="center"
               sx={{
                 position: 'relative',
-                aspectRatio: 1,
+                aspectRatio: 0.56,
                 overflow: 'hidden',
                 borderRadius: 2,
                 alignItems: 'center',
-                backgroundColor: 'background.default'
+                backgroundColor: 'background.default',
+                height: '100%'
               }}
             >
               {journey?.primaryImageBlock?.src != null ? (
                 <>
                   <HoverLayer className="hoverImageEffects" />
+                  <Box
+                    sx={{
+                      backgroundImage:
+                        'linear-gradient(to top, rgba(0, 0, 0, 0.9) 10%, rgba(0, 0, 0, 0))',
+                      backgroundPosition: 'bottom',
+                      backgroundRepeat: 'no-repeat',
+                      backgroundSize: '100% 50%',
+                      width: '100%',
+                      height: '100%',
+                      zIndex: 1
+                    }}
+                  />
                   <Image
                     rel={priority === true ? 'preload' : undefined}
                     priority={priority}
@@ -168,8 +182,11 @@ export function TemplateGalleryCard({
           )}
           <Stack
             sx={{
-              px: 0,
-              py: 3
+              px: 4,
+              py: 6,
+              position: 'absolute',
+              bottom: 0,
+              zIndex: 2
             }}
           >
             {journey != null ? (
@@ -180,7 +197,8 @@ export function TemplateGalleryCard({
                     whiteSpace: 'noWrap',
                     overflow: 'hidden',
                     textOverflow: 'ellipsis',
-                    color: (theme) => theme.palette.grey[700]
+                    color: (theme) => theme.palette.background.default
+                    // color: (theme) => theme.palette.grey[700]
                   }}
                 >
                   {t('{{ date }} ● {{ displayLanguage }}', {
@@ -191,20 +209,21 @@ export function TemplateGalleryCard({
                 <Box
                   sx={{
                     display: { xs: 'none', md: '-webkit-box' },
-                    height: '66px',
-                    overflow: 'hidden',
-                    textOverflow: 'ellipsis',
-                    WebkitBoxOrient: 'vertical',
-                    WebkitLineClamp: 3
+                    WebkitBoxOrient: 'vertical'
+                    // height: '66px',
+                    // overflow: 'hidden',
+                    // WebkitLineClamp: 3
+                    // textOverflow: 'ellipsis',
                   }}
                 >
                   <Typography
-                    variant="subtitle2"
+                    variant="h4"
                     sx={{
+                      color: (theme) => theme.palette.background.default,
                       my: 1
                     }}
                   >
-                    {journey.title}
+                    In Our Darkest Hours, Where Is God? {journey.title}
                   </Typography>
                 </Box>
                 <Box

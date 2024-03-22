@@ -75,7 +75,7 @@ export function TemplateGalleryCarousel<T>({
       onMouseOver={() => setHovered(true)}
       onMouseLeave={() => setHovered(false)}
     >
-      {heading != null && <Typography variant="h5">{heading}</Typography>}
+      {heading != null && <Typography variant="h6">{heading}</Typography>}
       {loading ? (
         <Stack
           direction="row"
@@ -99,7 +99,7 @@ export function TemplateGalleryCarousel<T>({
           freeMode
           speed={850}
           slidesPerView="auto"
-          spaceBetween={20}
+          // spaceBetween={20} // Conflicting with spacing set inside the breakpoints
           watchOverflow
           allowTouchMove
           observer
@@ -121,7 +121,7 @@ export function TemplateGalleryCarousel<T>({
                   }
                   swiper?.slideTo(index)
                 }}
-                sx={{ mr: cardSpacing }}
+                // sx={{ mr: cardSpacing }}
               >
                 {renderItem({ item, priority })}
               </StyledSwiperSlide>
