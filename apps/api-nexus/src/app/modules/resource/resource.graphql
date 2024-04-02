@@ -30,6 +30,10 @@ type GoogleAuthResponse {
   accessToken: String!
 }
 
+type ExportResponse {
+  name: String!
+}
+
 enum PrivacyStatus {
   public
   unlisted
@@ -95,6 +99,10 @@ input BatchJobBatch {
   batchName: String!
 }
 
+input ResourceExportData {
+  id: ID!
+}
+
 input BatchJobResource {
   resource: ID!
   channel: ID!
@@ -108,6 +116,7 @@ input BatchJobInput {
 extend type Query {
   resources(where: ResourceFilter): [Resource!]
   resource(id: ID!): Resource!
+  resourceExportData(input: ResourceExportData): ExportResponse
 }
 
 extend type Mutation {

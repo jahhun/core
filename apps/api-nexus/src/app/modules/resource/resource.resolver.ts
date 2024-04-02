@@ -17,7 +17,7 @@ import {
 } from '../../__generated__/graphql';
 import { CloudFlareService } from '../../lib/cloudFlare/cloudFlareService';
 import { GoogleOAuthService } from '../../lib/googleOAuth/googleOAuth';
-import { PrismaService } from '../../lib/prisma.service';
+import { LanguagePrismaService, PrismaService, VideoPrismaService } from '../../lib/prisma.service';
 import { YoutubeService } from '../../lib/youtube/youtubeService';
 import { BatchService } from '../batch/batchService';
 import { BullMQService } from '../bullMQ/bullMQ.service';
@@ -36,6 +36,8 @@ export class ResourceResolver {
     private readonly youtubeService: YoutubeService,
     private readonly bullMQService: BullMQService,
     private readonly batchService: BatchService,
+    private readonly languagePrismaService: LanguagePrismaService,
+    private readonly videoPrismaService: VideoPrismaService
   ) {}
 
   @Query()
@@ -85,6 +87,19 @@ export class ResourceResolver {
       include: { localizations: true },
     });
     return resource;
+  }
+
+  @Mutation()
+  async resourceExportData(
+    @Args('id') id: string): Promise<{name: string}> {
+      const videoCount = await this.videoPrismaService.video.count();
+      const languagecount = await this.languagePrismaService.language.count();
+
+      const items = await this.videoPrismaService.video.findMany({take: 10, include: {title: true}})
+      items.forEach((item) => {
+        console.log(item.title)
+      });
+      return {name: `Video-Count: $ ${videoCount} | Language-Count: ${languagecount}`};
   }
 
   @Mutation()

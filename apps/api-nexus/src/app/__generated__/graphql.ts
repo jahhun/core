@@ -162,6 +162,10 @@ export class BatchJobBatch {
     batchName: string;
 }
 
+export class ResourceExportData {
+    id: string;
+}
+
 export class BatchJobResource {
     resource: string;
     channel: string;
@@ -212,6 +216,8 @@ export abstract class IQuery {
     abstract resources(where?: Nullable<ResourceFilter>): Nullable<Resource[]> | Promise<Nullable<Resource[]>>;
 
     abstract resource(id: string): Resource | Promise<Resource>;
+
+    abstract resourceExportData(input?: Nullable<ResourceExportData>): Nullable<ExportResponse> | Promise<Nullable<ExportResponse>>;
 }
 
 export class Channel {
@@ -279,6 +285,11 @@ export class GoogleAuthResponse {
     __typename?: 'GoogleAuthResponse';
     id: string;
     accessToken: string;
+}
+
+export class ExportResponse {
+    __typename?: 'ExportResponse';
+    name: string;
 }
 
 export class Translation {

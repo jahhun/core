@@ -3,7 +3,7 @@ import { Module } from '@nestjs/common';
 import { CloudFlareService } from '../../lib/cloudFlare/cloudFlareService';
 import { GoogleSheetsService } from '../../lib/googleAPI/googleSheetsService';
 import { GoogleOAuthService } from '../../lib/googleOAuth/googleOAuth';
-import { PrismaService } from '../../lib/prisma.service';
+import { LanguagePrismaService, PrismaService, VideoPrismaService } from '../../lib/prisma.service';
 import { YoutubeService } from '../../lib/youtube/youtubeService';
 import { BatchModule } from '../batch/batch.module';
 import { BatchService } from '../batch/batchService';
@@ -18,6 +18,8 @@ import { ResourceResolver } from './resource.resolver';
   providers: [
     ResourceResolver,
     PrismaService,
+    VideoPrismaService,
+    LanguagePrismaService,
     GoogleOAuthService,
     GoogleDriveService,
     GoogleSheetsService,
