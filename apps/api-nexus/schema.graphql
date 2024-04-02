@@ -159,7 +159,6 @@ extend type Mutation {
   getGoogleAccessToken(input: GoogleAuthInput!): GoogleAuthResponse!
   uploadToYoutube(channelId: String!, resourceId: String!): Boolean
   resourceBatchJob(input: BatchJobInput!): String
-  resourceExportData(input: ResourceExportData): ExportResponse
 }
 
 type Nexus
@@ -233,10 +232,6 @@ type GoogleAuthResponse {
   accessToken: String!
 }
 
-type ExportResponse {
-  name: String!
-}
-
 enum PrivacyStatus {
   public
   unlisted
@@ -300,10 +295,6 @@ input GoogleAuthInput {
 input BatchJobBatch {
   id: ID!
   batchName: String!
-}
-
-input ResourceExportData {
-  id: ID!
 }
 
 input BatchJobResource {
