@@ -110,7 +110,20 @@ export function TemplateGallery(): ReactElement {
                 // }
               />
               <Tab
-                label={t('Social Media')}
+                label={t('Strategies')}
+                sx={{
+                  fontSize: '24px'
+                }}
+                // {...tabA11yProps('control-panel', 1)}
+                // sx={{ flexGrow: 1 }}
+                // disabled={
+                //   steps == null ||
+                //   selected === 'none' ||
+                //   journeyEditContentComponent !== ActiveJourneyEditContent.Canvas
+                // }
+              />
+              <Tab
+                label={t('Calendar')}
                 sx={{
                   fontSize: '24px'
                 }}

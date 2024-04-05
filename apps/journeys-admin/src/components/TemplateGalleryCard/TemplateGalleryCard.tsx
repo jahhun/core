@@ -151,11 +151,7 @@ export function TemplateGalleryCard({
                     src={journey?.primaryImageBlock?.src}
                     alt={journey?.primaryImageBlock.alt}
                     fill
-                    sizes={`(max-width: ${
-                      theme.breakpoints.values.md - 0.5
-                    }px) 130px, (max-width: ${
-                      theme.breakpoints.values.xl - 0.5
-                    }px) 180px, 280px`}
+                    // sizes={`(max-width: ${theme.breakpoints.values.md}px) 130px, (max-width: ${theme.breakpoints.values.xl}px) 180px, 280px`}
                     style={{
                       objectFit: 'cover'
                     }}
@@ -223,7 +219,7 @@ export function TemplateGalleryCard({
                       my: 1
                     }}
                   >
-                    In Our Darkest Hours, Where Is God? {journey.title}
+                    {journey.title}
                   </Typography>
                 </Box>
                 <Box
