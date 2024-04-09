@@ -23,6 +23,7 @@ import { BatchService } from '../batch/batchService';
 import { BullMQService } from '../bullMQ/bullMQ.service';
 import {
   GoogleDriveService,
+  SpreadsheetRow,
   SpreadsheetTemplateType,
 } from '../google-drive/googleDriveService';
 
@@ -391,5 +392,40 @@ export class ResourceResolver {
       id: tokenRecord.id,
       accessToken,
     };
+  }
+
+  @Mutation()
+  async getSheetData(
+    @CurrentUserId() userId: string,
+    @Args('nexusId') nexusId: string,
+    @Args('tokenId') tokenId: string,
+    @Args('spreadsheetId') spreadsheetId: string,
+  ): Promise<SpreadsheetRow[]> {
+    console.log('Get Sheet Data . . .');
+    const nexus = await this.prismaService.nexus.findUnique({
+      where: {
+        id: nexusId,
+        userNexuses: { every: { userId } },
+      },
+    });
+
+    if (nexus == null)
+      throw new GraphQLError('nexus not found', {
+        extensions: { code: 'NOT_FOUND' },
+      });
+
+    const googleAccessToken =
+      await this.prismaService.googleAccessToken.findUnique({
+        where: { id: tokenId },
+      });
+
+    if (googleAccessToken === null) {
+      throw new Error('Invalid tokenId');
+    }
+
+    const { accessToken, data } =
+      await this.googleDriveService.getSpreadsheetData(tokenId, spreadsheetId);
+
+    return data;
   }
 }

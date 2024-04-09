@@ -30,6 +30,28 @@ type GoogleAuthResponse {
   accessToken: String!
 }
 
+type SpreadsheetRow {
+  channel: String
+  filename: String
+  title: String
+  description: String
+  custom_thumbnail: String
+  keywords: String
+  category: String
+  privacy: String
+  spoken_language: String
+  video_id: String
+  caption_file: String
+  audio_track_file: String
+  language: String
+  caption_language: String
+  notify_subscribers: String
+  playlist_id: String
+  is_made_for_kids: String
+  media_component_id: String
+  text_language: String
+}
+
 enum PrivacyStatus {
   public
   unlisted
@@ -124,4 +146,9 @@ extend type Mutation {
   getGoogleAccessToken(input: GoogleAuthInput!): GoogleAuthResponse!
   uploadToYoutube(channelId: String!, resourceId: String!): Boolean
   resourceBatchJob(input: BatchJobInput!): String
+  getSheetData(
+    nexusId: String!
+    tokenId: String!
+    spreadsheetId: String!
+  ): [SpreadsheetRow!]
 }
