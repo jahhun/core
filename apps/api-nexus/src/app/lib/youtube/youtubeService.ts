@@ -1,7 +1,7 @@
 /* eslint-disable @typescript-eslint/no-misused-promises */
 import { createReadStream, statSync } from 'fs';
 
-import { BadRequestException , Injectable } from '@nestjs/common';
+import { BadRequestException, Injectable } from '@nestjs/common';
 import { google, youtube_v3 } from 'googleapis';
 import { GaxiosPromise, OAuth2Client } from 'googleapis-common';
 
@@ -44,10 +44,13 @@ export class YoutubeService {
     youtubeData: {
       token: string;
       filePath: string;
+      spokenLanguage: string;
       channelId: string;
       title: string;
       description: string;
       defaultLanguage: string;
+      category: string;
+      privacy: string;
     },
     progressCallback?: (progress: number) => Promise<void>,
   ): GaxiosPromise<youtube_v3.Schema$Video> {
@@ -67,10 +70,11 @@ export class YoutubeService {
               description: youtubeData.description,
               channelId: youtubeData.channelId,
               defaultLanguage: youtubeData.defaultLanguage ?? 'en',
-              categoryId: '22',
+              defaultAudioLanguage: youtubeData.spokenLanguage ?? 'en',
+              categoryId: youtubeData.category ?? '22',
             },
             status: {
-              privacyStatus: 'private',
+              privacyStatus: youtubeData.privacy ?? 'private',
             },
           },
           media: {
@@ -197,5 +201,65 @@ export class YoutubeService {
     };
 
     return await service.captions.insert(captionData);
+  }
+
+  async updateVideoInfo(youtubeData: {
+    token: string;
+    videoId: string;
+    title?: string;
+    description?: string;
+    defaultLanguage?: string;
+    privacyStatus?: string;
+    categoryId?: string;
+  }): Promise<youtube_v3.Schema$Video> {
+    const service = google.youtube('v3');
+
+    let updatedYoutubeResponse;
+    try {
+      const currentVideoResponse = await service.videos.list({
+        auth: this.authorize(youtubeData.token),
+        id: [youtubeData.videoId],
+        part: ['snippet'],
+      });
+
+      const currentCategoryId =
+        currentVideoResponse.data.items?.[0]?.snippet?.categoryId;
+
+      const videoCategories = await service.videoCategories.list({
+        auth: this.authorize(youtubeData.token),
+        regionCode: 'US',
+        part: ['id'],
+      });
+
+      const validCategoryIds =
+        // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+        videoCategories.data.items?.map((item) => item.id) || [];
+
+      const validCategoryId = validCategoryIds.includes(currentCategoryId)
+        ? currentCategoryId
+        : // eslint-disable-next-line @typescript-eslint/strict-boolean-expressions
+          youtubeData.categoryId || '22';
+
+      updatedYoutubeResponse = await service.videos.update({
+        auth: this.authorize(youtubeData.token),
+        part: ['snippet', 'status'],
+        requestBody: {
+          id: youtubeData.videoId,
+          snippet: {
+            title: youtubeData.title,
+            description: youtubeData.description,
+            defaultLanguage: youtubeData.defaultLanguage,
+            categoryId: validCategoryId,
+          },
+          status: {
+            privacyStatus: youtubeData.privacyStatus,
+          },
+        },
+      });
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+
+    return updatedYoutubeResponse;
   }
 }

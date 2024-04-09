@@ -58,10 +58,13 @@ export class UploadToBucket {
       {
         token: youtubeToken,
         filePath,
+        spokenLanguage: job.data.resource.spokenLanguage,
         channelId: job.data.channel.channelId,
         title: job.data.resource.title ?? '',
         description: job.data.resource.description ?? '',
         defaultLanguage: job.data.resource.language ?? 'en',
+        category: job.data.resource.category,
+        privacy: job.data.resource.privacy,
       },
       async (progress) => {
         progress = 66 + progress / 3;

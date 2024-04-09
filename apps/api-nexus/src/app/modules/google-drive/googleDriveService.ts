@@ -30,6 +30,7 @@ interface FileResponse {
 export enum SpreadsheetTemplateType {
   UPLOAD = 'upload',
   LOCALIZATION = 'localization',
+  UPDATE = 'update',
 }
 
 export interface SpreadsheetRow {
@@ -367,9 +368,28 @@ export class GoogleDriveService {
         }
       }
 
-      if (spreadsheetRow.video_id != null) {
+      if (spreadsheetRow.video_id != null && spreadsheetRow.language != null) {
         console.log('video_id', spreadsheetRow.video_id);
         templateType = SpreadsheetTemplateType.LOCALIZATION;
+        const rowChannel = await this.prismaService.channel.findFirst({
+          where: {
+            resourceYoutubeChannel: {
+              some: { youtubeId: spreadsheetRow.video_id },
+            },
+          },
+          include: { youtube: true },
+        });
+
+        console.log('rowChannel', rowChannel);
+        if (rowChannel !== null) {
+          spreadsheetRow.channelData = rowChannel;
+        }
+      }
+
+      if (spreadsheetRow.video_id != null && spreadsheetRow.text_language != null) {
+        console.log('video_id', spreadsheetRow.video_id);
+        templateType = SpreadsheetTemplateType.UPDATE;
+
         const rowChannel = await this.prismaService.channel.findFirst({
           where: {
             resourceYoutubeChannel: {

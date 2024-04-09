@@ -32,6 +32,7 @@ export class BatchService {
           createdAt: new Date(),
           customThumbnail: row.custom_thumbnail,
           category: row.category,
+          spokenLanguage: row.spoken_language,
           privacy: row.privacy as PrivacyStatus,
           notifySubscribers: row.notify_subscribers,
           playlistId: row.playlist_id,
@@ -176,6 +177,71 @@ export class BatchService {
     return localizationBatch;
   }
 
+  async createUpdateResourceFromSpreadsheet(
+    refreshToken: string,
+    data: SpreadsheetRow[],
+  ): Promise<
+    Array<{
+      resourceId: string;
+      localizations: ResourceLocalization[];
+      channel: Channel;
+    }>
+  > {
+    const batchResources: Array<{
+      resourceId: string;
+      localizations: ResourceLocalization[];
+      channel: Channel;
+    }> = [];
+
+    for (const row of data) {
+      try {
+        const resourceYoutubeChannel =
+          await this.prismaService.resourceYoutubeChannel.findFirst({
+            where: { youtubeId: row.video_id },
+            select: {
+              resourceId: true,
+            },
+          });
+
+        if (resourceYoutubeChannel != null) {
+          await this.prismaService.resourceLocalization.updateMany({
+            where: {
+              AND: [
+                { resourceId: resourceYoutubeChannel.resourceId },
+                { language: row.text_language },
+              ],
+            },
+            data: { title: row.title, description: row.description },
+          });
+
+          const updatedLocalizations =
+            await this.prismaService.resourceLocalization.findMany({
+              where: {
+                resourceId: resourceYoutubeChannel.resourceId,
+                language: row.text_language,
+              },
+            });
+
+          if (row.channelData != null) {
+            batchResources.push({
+              resourceId: resourceYoutubeChannel.resourceId,
+              localizations: updatedLocalizations,
+              channel: row.channelData,
+            });
+          }
+        } else {
+          console.log(
+            'ResourceYoutubeChannel not found for the provided video_id',
+          );
+        }
+      } catch (error) {
+        console.error('Error processing row:', error);
+      }
+    }
+
+    return batchResources;
+  }
+
   prepareBatchResourcesForUploadBatchJob(
     batchResources: Array<{ resource: Resource; channel: Channel }>,
   ): Array<{ channel: Channel; resources: Resource[] }> {
@@ -217,11 +283,10 @@ export class BatchService {
       localizations: ResourceLocalization[];
     }> = [];
 
-    // Extract unique videoIds, ignoring null values
     const uniqueVideoIds = batchResourceLocalizations
       .map((item) => item.resourceLocalization.videoId)
-      .filter((videoId): videoId is string => videoId !== null) // Filter out null values and ensure videoId is treated as string
-      .filter((value, index, self) => self.indexOf(value) === index); // Remove duplicates
+      .filter((videoId): videoId is string => videoId !== null)
+      .filter((value, index, self) => self.indexOf(value) === index);
 
     for (const videoId of uniqueVideoIds) {
       const localizationsAndChannels = batchResourceLocalizations.filter(
@@ -231,11 +296,66 @@ export class BatchService {
       const localizations = localizationsAndChannels.map(
         (item) => item.resourceLocalization,
       );
-      const channel = localizationsAndChannels[0]?.channel; // Choose the first channel as the representative
+      const channel = localizationsAndChannels[0]?.channel;
 
       if (channel !== null) {
-        // Ensure channel is not undefined
         batches.push({ videoId, localizations, channel });
+      }
+    }
+
+    return batches;
+  }
+
+  prepareBatchUpdatesForBatchJob(
+    batchUpdateData: Array<{
+      video_id: string;
+      title: string;
+      description: string;
+      text_language: string;
+      channelData: Channel;
+    }>,
+  ): Array<{
+    videoId: string;
+    updates: Array<{
+      title: string;
+      description: string;
+      text_language: string;
+    }>;
+    channel: Channel;
+  }> {
+    const batches: Array<{
+      videoId: string;
+      updates: Array<{
+        title: string;
+        description: string;
+        text_language: string;
+      }>;
+      channel: Channel;
+    }> = [];
+
+    const uniqueVideoIds = [
+      ...new Set(batchUpdateData.map((item) => item.video_id)),
+    ];
+
+    for (const videoId of uniqueVideoIds) {
+      const updatesForVideo = batchUpdateData.filter(
+        (item) => item.video_id === videoId,
+      );
+
+      const channel = updatesForVideo[0]?.channelData;
+
+      const updates = updatesForVideo.map((update) => ({
+        title: update.title,
+        description: update.description,
+        text_language: update.text_language,
+      }));
+
+      if (channel != null) {
+        batches.push({
+          videoId,
+          updates,
+          channel,
+        });
       }
     }
 

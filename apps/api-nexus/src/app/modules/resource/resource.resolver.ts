@@ -301,7 +301,72 @@ export class ResourceResolver {
         );
       }
       return [];
+    } else if (templateType === SpreadsheetTemplateType.UPDATE) {
+      console.log('IN UPDATE');
+      console.log('spreadsheetData', spreadsheetData);
+
+      const updatePromises = spreadsheetData.map(async (row) => {
+        if (row.video_id == null || row.channelData == null) {
+          console.error(
+            `Missing video_id or channel data for row, skipping update. Video ID: ${
+              row.video_id
+            }, Channel Data Exists: ${Boolean(row.channelData)}`,
+          );
+          return null;
+        }
+
+        try {
+          const channel = await this.prismaService.channel.findUnique({
+            where: {
+              id: row.channelData.id,
+            },
+            include: {
+              youtube: true,
+            },
+          });
+
+          if (channel == null || channel.youtube == null) {
+            console.error(
+              'YouTube details not found for channel:',
+              row.channelData.id,
+            );
+            return null;
+          }
+
+          const refreshToken = channel.youtube.refreshToken;
+          const youtubeToken = await this.googleOAuthService.getNewAccessToken(
+            refreshToken,
+          );
+
+          const updateResponse = await this.youtubeService.updateVideoInfo({
+            token: youtubeToken,
+            videoId: row.video_id,
+            title: row.title,
+            description: row.description,
+            defaultLanguage: row.text_language,
+            privacyStatus: 'private',
+          });
+
+          return {
+            videoId: row.video_id,
+            updateResponse,
+            channel: row.channelData,
+          };
+        } catch (error) {
+          console.error(
+            'Error updating video info for video_id:',
+            row.video_id,
+            error,
+          );
+          return null;
+        }
+      });
+
+      const updateResults = await Promise.all(updatePromises);
+      console.log('updateResults', updateResults);
+      // return updateResults.filter((result) => result !== null);
     }
+
     return [];
   }
 
