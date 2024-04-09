@@ -176,6 +176,7 @@ export class Batch {
     __typename?: 'Batch';
     id: string;
     nexusId: string;
+    nexusId: string;
     name: string;
     status: BatchStatus;
     tasks: BatchTask[];
@@ -323,5 +324,6 @@ export class Language {
 }
 
 export type DateTime = String;
+export type Object = any;
 export type Upload = any;
 type Nullable<T> = T | null;

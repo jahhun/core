@@ -116,43 +116,6 @@ export class BatchResolver {
     return (completedTasks / tasks.length) * 100;
   }
 
-  // @Query()
-  // async batch(
-  //   @CurrentUserId() userId: string,
-  //   @Args('id') id: string,
-  // ): Promise<BatchWithAverage | null> {
-  //   const batch = await this.prismaService.batch.findUnique({
-  //     where: {
-  //       id,
-  //       AND: [{ nexus: { userNexuses: { some: { userId } } } }],
-  //     },
-  //     include: {
-  //       channel: { include: { youtube: true } },
-  //       resources: {
-  //         include: {
-  //           resource: true,
-  //         },
-  //       },
-  //     },
-  //   });
-
-  //   if (batch == null) {
-  //     return null;
-  //   }
-
-  //   const totalPercent = batch.resources.reduce(
-  //     (acc, curr) => acc + curr.percent,
-  //     0,
-  //   );
-  //   const averagePercent =
-  //     batch.resources.length > 0 ? totalPercent / batch.resources.length : 0;
-
-  //   return {
-  //     ...batch,
-  //     averagePercent,
-  //   };
-  // }
-
   @Query()
   async batch(
     @CurrentUserId() userId: string,
