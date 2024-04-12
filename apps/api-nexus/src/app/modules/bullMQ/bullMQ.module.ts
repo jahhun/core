@@ -12,9 +12,9 @@ import { GoogleDriveService } from '../google-drive/googleDriveService';
 import { BullMQService } from './bullMQ.service';
 import { UpdateCaption } from './consumers/updateCaption';
 import { UpdateLocalization } from './consumers/updateLocalization';
-import { UploadToBucket } from './consumers/uploadToBucket';
+import { UploadVideo } from './consumers/upload.video';
 import { UploadToYoutube } from './consumers/uploadToYoutube';
-import { NexusJobListener } from './listener/jobListener';
+import { UploadVideoListener } from './listener/upload.video.listener';
 
 @Global()
 @Module({
@@ -45,7 +45,7 @@ import { NexusJobListener } from './listener/jobListener';
     BullMQService,
     UpdateLocalization,
     UpdateCaption,
-    UploadToBucket,
+    UploadVideo,
     UploadToYoutube,
     GoogleDriveService,
     GoogleOAuthService,
@@ -53,7 +53,7 @@ import { NexusJobListener } from './listener/jobListener';
     YoutubeService,
     BucketService,
     PrismaService,
-    NexusJobListener,
+    UploadVideoListener,
   ],
   exports: [BullMQService],
 })

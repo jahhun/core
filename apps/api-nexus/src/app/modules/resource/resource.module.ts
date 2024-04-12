@@ -12,11 +12,13 @@ import { GoogleDriveModule } from '../google-drive/googleDrive.module';
 import { GoogleDriveService } from '../google-drive/googleDriveService';
 
 import { ResourceResolver } from './resource.resolver';
+import { ResourceService } from './resource.service';
 
 @Module({
   imports: [GoogleDriveModule, BatchModule],
   providers: [
     ResourceResolver,
+    ResourceService,
     PrismaService,
     GoogleOAuthService,
     GoogleDriveService,

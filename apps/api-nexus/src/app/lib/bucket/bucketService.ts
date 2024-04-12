@@ -26,11 +26,10 @@ export class BucketService {
     };
     const bucketFile = s3.upload(params);
 
-    // eslint-disable-next-line @typescript-eslint/no-misused-promises
-    bucketFile.on('httpUploadProgress', async (progress) => {
+    bucketFile.on('httpUploadProgress', (progress) => {
       const percentage = (progress.loaded / progress.total) * 100;
       if (progressCallback != null) {
-        await progressCallback(percentage);
+        void progressCallback(percentage);
       }
       console.log('Uploading:', percentage, '%');
     });

@@ -26,10 +26,13 @@ import {
   SpreadsheetTemplateType,
 } from '../google-drive/googleDriveService';
 
+import { ResourceService } from './resource.service';
+
 @Resolver('Resource')
 export class ResourceResolver {
   constructor(
     private readonly prismaService: PrismaService,
+    private readonly resourceService: ResourceService,
     private readonly googleOAuthService: GoogleOAuthService,
     private readonly googleDriveService: GoogleDriveService,
     private readonly cloudFlareService: CloudFlareService,
@@ -230,77 +233,15 @@ export class ResourceResolver {
         extensions: { code: 'NOT_FOUND' },
       });
 
-    const googleAccessToken =
-      await this.prismaService.googleAccessToken.findUnique({
-        where: { id: tokenId },
-      });
+    const { templateType, spreadsheetData, googleAccessToken } = await this.resourceService.getTemplateData(tokenId, spreadsheetId, drivefolderId)
 
-    if (googleAccessToken === null) {
-      throw new Error('Invalid tokenId');
-    }
-
-    const { accessToken, data } =
-      await this.googleDriveService.getSpreadsheetData(tokenId, spreadsheetId);
-
-    const { templateType, spreadsheetData } =
-      await this.googleDriveService.populateSpreadsheetData(
-        accessToken,
-        drivefolderId,
-        data,
-      );
-
+    // CHECK SPREADSHEET TEMPLATE TYPE
     if (templateType === SpreadsheetTemplateType.UPLOAD) {
-      console.log('IN UPLOAD');
-      console.log('spreadsheetData', spreadsheetData);
-      const batchResources =
-        await this.batchService.createUploadResourceFromSpreadsheet(
-          nexus.id,
-          googleAccessToken.refreshToken,
-          spreadsheetData,
-        );
-
-      console.log('batchResources', batchResources);
-
-      const preparedBatchJobs =
-        this.batchService.prepareBatchResourcesForUploadBatchJob(
-          batchResources,
-        );
-
-      console.log('preparedBatchJobs', preparedBatchJobs);
-
-      for (const preparedBatchJob of preparedBatchJobs) {
-        await this.bullMQService.createUploadBatch(
-          uuidv4(),
-          nexusId,
-          preparedBatchJob.channel,
-          preparedBatchJob.resources,
-        );
-      }
-      return batchResources.map((item) => item.resource);
+      // PROCESS UPLOAD TEMPLATE
+      return await this.resourceService.processUploadTemplateBatches(nexus.id, googleAccessToken, spreadsheetData);
     } else if (templateType === SpreadsheetTemplateType.LOCALIZATION) {
-      console.log('IN LOCALIZATION');
-      console.log('spreadsheetData', spreadsheetData);
-      const batchLocalizations =
-        await this.batchService.createResourcesLocalization(
-          googleAccessToken.refreshToken,
-          spreadsheetData,
-        );
-      console.log('batchLocalizations', batchLocalizations);
-      const preparedBatchJobs =
-        this.batchService.prepareBatchResourceLocalizationsForBatchJob(
-          batchLocalizations,
-        );
-      console.log('preparedBatchJobs', preparedBatchJobs);
-      for (const preparedBatchJob of preparedBatchJobs) {
-        await this.bullMQService.createLocalizationBatch(
-          uuidv4(),
-          nexusId,
-          preparedBatchJob.videoId,
-          preparedBatchJob.channel,
-          preparedBatchJob.localizations,
-        );
-      }
-      return [];
+      // PROCESS LOCALIZATION TEMPLATE
+      return await this.resourceService.processLocalizationTemplateBatches(nexus.id, googleAccessToken, spreadsheetData);
     }
     return [];
   }

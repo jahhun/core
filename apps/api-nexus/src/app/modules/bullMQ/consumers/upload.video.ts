@@ -8,7 +8,7 @@ import { GoogleDriveService } from '../../google-drive/googleDriveService';
 import { UploadToBucketToYoutube } from '../bullMQ.service';
 
 @Processor('nexus-bucket')
-export class UploadToBucket {
+export class UploadVideo {
   constructor(
     private readonly googleDriveService: GoogleDriveService,
     private readonly googleOAuthService: GoogleOAuthService,
@@ -20,12 +20,13 @@ export class UploadToBucket {
   async process(
     job: Job<UploadToBucketToYoutube>,
   ): Promise<UploadToBucketToYoutube> {
-    console.log('BUCKET JOB DATA: ', job.data);
+    console.log('UPLOAD VIDEO TASK JOB DATA: ', job.data);
     const driveToken = await this.googleOAuthService.getNewAccessToken(
       job.data.resource.refreshToken,
     );
 
     console.log('DOWNLOAD FROM DRIVE: ', job.data.resource.driveId);
+    // DOWNLOAD FROM DRIVE
     const filePath = await this.googleDriveService.downloadDriveFile(
       { fileId: job.data.resource.driveId, accessToken: driveToken },
       async (downloadProgress) => {
@@ -35,6 +36,7 @@ export class UploadToBucket {
     );
 
     console.log('UPLOADING FILE TO BUCKET: ', filePath);
+    // DOWNLOAD FROM DRIVE
     const bucketFile = await this.bucketService.uploadFile(
       filePath,
       process.env.BUCKET_NAME ?? 'bucket-name',
@@ -45,7 +47,8 @@ export class UploadToBucket {
       },
     );
 
-    console.log('UPLOAD TO YOUTUBE', filePath);
+    console.log('UPLOAD TO YOUTUBE NOW', filePath);
+    // UPLOAD TO YOUTUBE NOW
     // const youtubeData = await this.youtubeService.uploadVideo(
     //   {
     //     token: await this.googleOAuthService.getNewAccessToken(

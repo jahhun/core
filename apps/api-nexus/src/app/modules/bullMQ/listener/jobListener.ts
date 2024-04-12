@@ -50,10 +50,28 @@ export class NexusJobListener implements OnModuleInit {
     this.uploadQueue.on(
       'completed',
       async (job: Job<UploadToBucketToYoutube>) => {
-        console.log('Job completed: ', job.id);
-        console.log('Job: ', job);
+        console.log('Job completed: ', job.returnvalue);
+        console.log('Job Completed Return: ', job.returnvalue.bucketFileId);
 
         if (job.name === 'video_upload') {
+
+          if(job?.returnvalue?.youtubeId != null) {
+            await this.prismaService.resourceYoutubeChannel.create({
+              data: {
+                resourceId: job.data.resource.id,
+                channelId: job.data.channel.id,
+                youtubeId: job.returnvalue.youtubeId,
+              },
+            });
+          }
+
+          if(job?.returnvalue?.bucketFileId != null) {
+            await this.prismaService.resource.update({
+              where: { id: job.data.resource.id },
+              data: { googleDrive: { update: { cloudFlareId: job.returnvalue.bucketFileId } } },
+            });
+          }
+
           // const driveToken = await this.googleOAuthService.getNewAccessToken(
           //   job.data.resource.refreshToken,
           // );
