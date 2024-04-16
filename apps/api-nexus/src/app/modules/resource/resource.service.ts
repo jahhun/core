@@ -3,7 +3,6 @@ import { v4 as uuidv4 } from 'uuid';
 
 import { Resource } from '.prisma/api-nexus-client';
 
-import { GoogleOAuthService } from '../../lib/googleOAuth/googleOAuth';
 import { PrismaService } from '../../lib/prisma.service';
 import { BatchService } from '../batch/batchService';
 import { BullMQService } from '../bullMQ/bullMQ.service';
@@ -17,9 +16,7 @@ import {
 export class ResourceService {
   constructor(
     private readonly prismaService: PrismaService,
-    private readonly googleOAuthService: GoogleOAuthService,
     private readonly googleDriveService: GoogleDriveService,
-    private readonly resourceService: ResourceService,
     private readonly bullMQService: BullMQService,
     private readonly batchService: BatchService,
   ) {}
@@ -92,7 +89,6 @@ export class ResourceService {
     googleAccessToken: { id: string; refreshToken: string },
     spreadsheetData: SpreadsheetRow[],
   ): Promise<Resource[]> {
-    // 
     console.log('spreadsheetData', spreadsheetData);
     const batchLocalizations =
       await this.batchService.createResourcesLocalization(

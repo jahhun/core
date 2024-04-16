@@ -36,7 +36,9 @@ export interface UploadToBucketToYoutube {
     refreshToken: string;
     title: string;
     description: string;
-    language: string;
+    language?: string;
+    thumbnailDriveId?: string;
+    captionDriveId?: string;
   };
   channel: {
     id: string;
@@ -158,7 +160,7 @@ export class BullMQService {
     @InjectQueue('nexus-bucket') private readonly bucketQueue: Queue,
   ) {}
 
-  async createUploadBatchJob(
+  private async createUploadBatchJob(
     batchId: string,
     channel: Channel,
   ): Promise<Array<Bull.Job<unknown>>> {
@@ -194,7 +196,7 @@ export class BullMQService {
           throw new Error('Resource not found');
         }
 
-        const jobData = {
+        const jobData: UploadToBucketToYoutube = {
           batchId: batch.id,
           batchTaskId: task.id,
           resource: {
@@ -224,7 +226,7 @@ export class BullMQService {
     );
   }
 
-  async createLocalizationBatchJob(
+  private async createLocalizationBatchJob(
     batchId: string,
     videoId: string,
     localizations: ResourceLocalization[],
