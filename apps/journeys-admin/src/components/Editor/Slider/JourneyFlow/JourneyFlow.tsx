@@ -38,6 +38,7 @@ import { useStepAndCardBlockCreateMutation } from '../../../../libs/useStepAndCa
 import { useStepBlockNextBlockUpdateMutation } from '../../../../libs/useStepBlockNextBlockUpdateMutation'
 import { useStepBlockPositionUpdateMutation } from '../../../../libs/useStepBlockPositionUpdateMutation'
 
+import CustomEdge from './edges/ButtonEdge'
 import { PositionMap, arrangeSteps } from './libs/arrangeSteps'
 import { transformSteps } from './libs/transformSteps'
 import { SocialPreviewNode } from './nodes/SocialPreviewNode'
@@ -65,6 +66,9 @@ export function JourneyFlow(): ReactElement {
   const connectingParams = useRef<OnConnectStartParams | null>(null)
   const [nodes, setNodes, onNodesChange] = useNodesState([])
   const [edges, setEdges, onEdgesChange] = useEdgesState([])
+  const edgeTypes = {
+    smart: CustomEdge
+  }
 
   const [reactFlowInstance, setReactFlowInstance] =
     useState<ReactFlowInstance | null>(null)
@@ -284,6 +288,7 @@ export function JourneyFlow(): ReactElement {
         onConnectStart={onConnectStart}
         onNodeDragStop={onNodeDragStop}
         fitView
+        edgeTypes={edgeTypes}
         nodeTypes={nodeTypes}
         proOptions={{ hideAttribution: true }}
         onInit={setReactFlowInstance}

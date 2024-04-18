@@ -1,5 +1,7 @@
 import AddCircleRoundedIcon from '@mui/icons-material/AddCircleRounded'
 import Box from '@mui/material/Box'
+import IconButton from '@mui/material/IconButton'
+import { useTheme } from '@mui/material/styles'
 import { ReactElement } from 'react'
 import {
   BaseEdge,
@@ -19,6 +21,7 @@ export default function CustomEdge({
   style = {},
   markerEnd
 }: EdgeProps): ReactElement {
+  const theme = useTheme()
   const [edgePath, labelX, labelY] = getBezierPath({
     sourceX,
     sourceY,
@@ -28,8 +31,8 @@ export default function CustomEdge({
     targetPosition
   })
 
-  const onEdgeClick = (params): void => {
-    console.log('button clicked! ' + params)
+  const handleClick = (params): void => {
+    console.log('button clicked! ' + id)
   }
 
   return (
@@ -37,41 +40,20 @@ export default function CustomEdge({
       <BaseEdge path={edgePath} markerEnd={markerEnd} style={style} />
       <EdgeLabelRenderer>
         <Box
-          style={{
+          sx={{
             position: 'absolute',
             transform: `translate(-50%, -50%) translate(${labelX}px,${labelY}px)`,
-            pointerEvents: 'all',
-            padding: 0,
-            margin: 0,
-            display: 'flex',
-            alignItems: 'center',
-            justifyContent: 'center'
+            pointerEvents: 'all'
           }}
           className="nodrag nopan"
         >
-          <button
-            className="edgebutton"
-            onClick={onEdgeClick}
-            style={{
-              borderRadius: '50%',
-              background: 'white',
-              borderColor: 'transparent',
-              cursor: 'pointer',
-              margin: 0,
-              padding: 0,
-              display: 'flex',
-              alignItems: 'center'
-            }}
-          >
+          <IconButton className="edgebutton" onClick={handleClick}>
             <AddCircleRoundedIcon
               sx={{
-                color: '#3aa74a',
-                fontSize: 'large',
-                padding: 0,
-                margin: 0
+                color: theme.palette.success.main
               }}
             />
-          </button>
+          </IconButton>
         </Box>
       </EdgeLabelRenderer>
     </>
