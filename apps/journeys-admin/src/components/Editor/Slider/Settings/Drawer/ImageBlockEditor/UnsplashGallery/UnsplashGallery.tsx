@@ -154,7 +154,7 @@ export function UnsplashGallery({
         variables: { query, page: page + 1, perPage: 20 }
       })
     }
-    setPage(page + 1)
+    setPage(page + 2)
   }
 
   const handleCollectionChange = (id, query): void => {
