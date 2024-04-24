@@ -1,17 +1,13 @@
-import { gql, useMutation, useQuery } from '@apollo/client'
+import { gql, useQuery } from '@apollo/client'
 import LoadingButton from '@mui/lab/LoadingButton'
 import Stack from '@mui/material/Stack'
 import Typography from '@mui/material/Typography'
 import { useTranslation } from 'next-i18next'
-import { ReactElement, useEffect, useState } from 'react'
+import { ReactElement, useState } from 'react'
 
 import { ListUnsplashCollectionPhotos } from '../../../../../../../../__generated__/ListUnsplashCollectionPhotos'
-import { SearchUnsplashPhotos } from '../../../../../../../../__generated__/SearchUnsplashPhotos'
-import { TriggerUnsplashDownload } from '../../../../../../../../__generated__/TriggerUnsplashDownload'
 
-import { UnsplashCollections } from './UnsplashCollections'
 import { UnsplashList } from './UnsplashList'
-import { UnsplashSearch } from './UnsplashSearch'
 
 export const LIST_UNSPLASH_COLLECTION_PHOTOS = gql`
   query ListUnsplashCollectionPhotos(
@@ -45,147 +41,53 @@ export const LIST_UNSPLASH_COLLECTION_PHOTOS = gql`
   }
 `
 
-export const SEARCH_UNSPLASH_PHOTOS = gql`
-  query SearchUnsplashPhotos($query: String!, $page: Int, $perPage: Int) {
-    searchUnsplashPhotos(query: $query, page: $page, perPage: $perPage) {
-      results {
-        id
-        alt_description
-        blur_hash
-        width
-        height
-        urls {
-          small
-          regular
-        }
-        links {
-          download_location
-        }
-        user {
-          first_name
-          last_name
-          username
-        }
-      }
-    }
-  }
-`
-
 export const TRIGGER_UNSPLASH_DOWNLOAD = gql`
   mutation TriggerUnsplashDownload($url: String!) {
     triggerUnsplashDownload(url: $url)
   }
 `
 
-export interface UnsplashAuthor {
-  fullname: string
-  username: string
-}
-
-interface UnsplashGalleryProps {
-  onChange: (
-    src: string,
-    unsplashAuthor: UnsplashAuthor,
-    blurhash?: string,
-    width?: number,
-    height?: number
-  ) => void
-}
-
-export function UnsplashGallery({
-  onChange
-}: UnsplashGalleryProps): ReactElement {
-  const [query, setQuery] = useState<string>()
+export function UnsplashGallery(): ReactElement {
+  const [query] = useState<string>()
   const [page, setPage] = useState(1)
-  const [collectionId, setCollectionId] = useState('4924556')
+  const [collectionId] = useState('4924556')
 
-  useEffect(() => {
-    setPage(1)
-  }, [collectionId])
-
-  const {
-    data: listData,
-    refetch: refetchList,
-    fetchMore: fetchMoreList
-  } = useQuery<ListUnsplashCollectionPhotos>(LIST_UNSPLASH_COLLECTION_PHOTOS, {
-    variables: { collectionId, page, perPage: 20 },
-    skip: query != null
-  })
-  const [triggerUnsplashDownload] = useMutation<TriggerUnsplashDownload>(
-    TRIGGER_UNSPLASH_DOWNLOAD
-  )
-  const {
-    data: searchData,
-    refetch: refetchSearch,
-    fetchMore: fetchMoreSearch
-  } = useQuery<SearchUnsplashPhotos>(SEARCH_UNSPLASH_PHOTOS, {
-    variables: { query, page, perPage: 20 },
-    skip: query == null
-  })
-  const handleChange = (
-    src: string,
-    unsplashAuthor: UnsplashAuthor,
-    downloadLocation: string,
-    blurhash?: string,
-    width?: number,
-    height?: number
-  ): void => {
-    onChange(src, unsplashAuthor, blurhash, width, height)
-    void triggerUnsplashDownload({ variables: { url: downloadLocation } })
-  }
-
-  const handleSubmit = (value: string): void => {
-    if (value == null) {
-      void refetchList({ collectionId, page: 1, perPage: 20 })
-    } else {
-      void refetchSearch({ query: value, page: 1, perPage: 20 })
-    }
-    setQuery(value)
-    setPage(1)
-  }
+  const { data: listData, fetchMore: fetchMoreList } =
+    useQuery<ListUnsplashCollectionPhotos>(LIST_UNSPLASH_COLLECTION_PHOTOS, {
+      variables: { collectionId, page, perPage: 2 },
+      skip: query != null
+    })
 
   const nextPage = (): void => {
+    console.log('next page')
+    setPage(page + 1)
     if (query == null) {
       void fetchMoreList({
-        variables: { collectionId, page: page + 1, perPage: 20 }
-      })
-    } else {
-      void fetchMoreSearch({
-        variables: { query, page: page + 1, perPage: 20 }
+        variables: { collectionId, page, perPage: 3 }
       })
     }
-    setPage(page + 1)
-  }
-
-  const handleCollectionChange = (id, query): void => {
-    setCollectionId(id)
-    setQuery(query)
   }
 
   const { t } = useTranslation('apps-journeys-admin')
 
+  // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-empty-function
+  function a() {}
+
   return (
     <Stack sx={{ p: 6 }} data-testid="UnsplashGallery">
-      <UnsplashSearch value={query} handleSubmit={handleSubmit} />
-      <UnsplashCollections onClick={handleCollectionChange} />
       <Stack sx={{ pt: 4, pb: 1 }}>
         <Typography variant="overline" color="primary">
           {t('Unsplash')}
         </Typography>
         <Typography variant="h6">{t('Featured Images')}</Typography>
       </Stack>
-      {query == null && listData != null && (
+      {query == null && listData !== undefined && (
         <UnsplashList
           gallery={listData.listUnsplashCollectionPhotos}
-          onChange={handleChange}
+          onChange={a}
         />
       )}
-      {query != null && searchData != null && (
-        <UnsplashList
-          gallery={searchData.searchUnsplashPhotos.results}
-          onChange={handleChange}
-        />
-      )}
+
       <LoadingButton variant="outlined" onClick={nextPage} size="medium">
         {t('Load More')}
       </LoadingButton>
