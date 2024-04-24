@@ -48,6 +48,7 @@ export class YoutubeService {
       title: string;
       description: string;
       defaultLanguage: string;
+      privacyStatus?: string;
     },
     progressCallback?: (progress: number) => Promise<void>,
   ): GaxiosPromise<youtube_v3.Schema$Video> {
@@ -70,7 +71,7 @@ export class YoutubeService {
               categoryId: '22',
             },
             status: {
-              privacyStatus: 'private',
+              privacyStatus: youtubeData.privacyStatus ?? 'private',
             },
           },
           media: {
@@ -86,6 +87,54 @@ export class YoutubeService {
           },
         },
       );
+    } catch (error) {
+      throw new BadRequestException(error.message);
+    }
+
+    return uploadedYoutubeResponse;
+  }
+
+  async updateVideo(youtubeData: {
+    token: string;
+    videoId: string;
+    title?: string;
+    description?: string;
+    defaultLanguage?: string;
+    privacyStatus?: string;
+    localizations: Array<{
+      resourceId?: string;
+      title?: string;
+      description?: string;
+      tags?: string[];
+      language: string;
+      captionDriveId?: string;
+    }>
+  }): GaxiosPromise<youtube_v3.Schema$Video> {
+    const service = google.youtube('v3');
+    let uploadedYoutubeResponse;
+    try {
+      const convertedLocalizations = {};
+      youtubeData.localizations?.forEach((item) => {
+        convertedLocalizations[item.language] = {
+          title: item.title,
+          description: item.description,
+        };
+      });
+      uploadedYoutubeResponse = await service.videos.update({
+        auth: this.authorize(youtubeData.token),
+        part: ['snippet', 'localizations'],
+        requestBody: {
+          id: youtubeData.videoId,
+          snippet: {
+            title: youtubeData.title,
+            description: youtubeData.description,
+          },
+          status: {
+            privacyStatus: youtubeData.privacyStatus,
+          },
+          localizations: convertedLocalizations,
+        },
+      });
     } catch (error) {
       throw new BadRequestException(error.message);
     }

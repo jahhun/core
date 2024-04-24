@@ -47,6 +47,8 @@ export class UploadVideo {
       },
     );
 
+    console.log("resource", job?.data?.resource);
+
     // UPLOAD VIDEO
     console.log('UPLOAD TO YOUTUBE NOW', videoFilePath);
     const youtubeData = await this.youtubeService.uploadVideo(
@@ -59,6 +61,7 @@ export class UploadVideo {
         title: job.data.resource.title ?? '',
         description: job.data.resource.description ?? '',
         defaultLanguage: job.data.resource.language ?? 'en',
+        privacyStatus: job.data.resource.privacyStatus
       },
       async (progress) => {
         progress = 55 + progress / 3;
@@ -151,7 +154,7 @@ export class UploadVideo {
     }
 
     await job.progress(100);
-    // return { ...job.returnvalue, bucketFileId: bucketFile.Key };
-    return { ...job.returnvalue, youtubeId: youtubeData?.data?.id, bucketFileId: bucketFile.Key };
+    return { ...job.returnvalue, bucketFileId: bucketFile.Key };
+    // return { ...job.returnvalue, youtubeId: youtubeData?.data?.id, bucketFileId: bucketFile.Key };
   }
 }

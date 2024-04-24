@@ -12,8 +12,8 @@ import { GoogleDriveService } from '../google-drive/googleDriveService';
 import { BullMQService } from './bullMQ.service';
 import { UpdateCaption } from './consumers/updateCaption';
 import { UpdateLocalization } from './consumers/updateLocalization';
+import { UploadLocalization } from './consumers/upload.localization';
 import { UploadVideo } from './consumers/upload.video';
-import { UploadToYoutube } from './consumers/uploadToYoutube';
 import { UploadVideoListener } from './listener/upload.video.listener';
 
 @Global()
@@ -30,7 +30,7 @@ import { UploadVideoListener } from './listener/upload.video.listener';
         name: 'nexus-batches',
       },
       {
-        name: 'nexus-youtube',
+        name: 'nexus-upload-localization',
       },
       {
         name: 'nexus-bucket',
@@ -46,7 +46,7 @@ import { UploadVideoListener } from './listener/upload.video.listener';
     UpdateLocalization,
     UpdateCaption,
     UploadVideo,
-    UploadToYoutube,
+    UploadLocalization,
     GoogleDriveService,
     GoogleOAuthService,
     GoogleSheetsService,

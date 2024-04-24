@@ -12,12 +12,7 @@ export class UpdateLocalization {
   async process(job: Job<UpdateVideoLocalization>): Promise<void> {
     console.log('LOCALIZATION JOB DATA: ', job.data);
 
-    await this.youtubeService.addLocalizedMetadataAndUpdateTags({
-      batchId: job.data.batchId,
-      videoId: job.data.videoId,
-      channel: job.data.channel,
-      localizations: job.data.localizations,
-    });
+
 
     await job.progress(100);
   }

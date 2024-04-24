@@ -39,6 +39,7 @@ export interface UploadToBucketToYoutube {
     language?: string;
     thumbnailDriveId?: string;
     captionDriveId?: string;
+    privacyStatus?: string;
   };
   channel: {
     id: string;
@@ -87,12 +88,18 @@ export interface UpdateVideoLocalization {
     channelId: string;
     refreshToken: string;
   };
+  resource: {
+    refreshToken: string;
+    thumbnailDriveId?: string;
+    privacyStatus?: string;
+  };
   localizations: Array<{
-    resourceId: string;
-    title: string;
-    description: string;
-    tags: string[];
+    resourceId?: string;
+    title?: string;
+    description?: string;
+    tags?: string[];
     language: string;
+    captionDriveId?: string;
   }>;
 }
 
@@ -157,7 +164,7 @@ interface Job {
 export class BullMQService {
   constructor(
     private readonly prismaService: PrismaService,
-    @InjectQueue('nexus-bucket') private readonly bucketQueue: Queue,
+    @InjectQueue('nexus-upload-localization') private readonly bucketQueue: Queue,
   ) {}
 
   private async createUploadBatchJob(
@@ -189,6 +196,7 @@ export class BullMQService {
           include: {
             googleDrive: true,
             localizations: true,
+            thumbnailGoogleDrive: true,
           },
         });
 
@@ -205,6 +213,8 @@ export class BullMQService {
             refreshToken: resource.googleDrive?.refreshToken ?? '',
             title: resource.localizations[0]?.title ?? '',
             description: resource.localizations[0]?.description ?? '',
+            thumbnailDriveId: resource.thumbnailGoogleDrive?.driveId,
+            privacyStatus: resource.privacy ?? 'private',
           },
           channel: {
             id: channel?.id ?? '',
@@ -248,19 +258,6 @@ export class BullMQService {
     if (batch == null) {
       throw new Error('Batch not found');
     }
-
-    // Group localizations by videoId
-    // const localizationsByVideoId = localizations.reduce<
-    //   Record<string, ResourceLocalization[]>
-    // >((acc, localization) => {
-    //   const videoId = localization.videoId ?? 'unknown';
-    //   if (acc[videoId] === undefined) {
-    //     acc[videoId] = [];
-    //   }
-    //   acc[videoId].push(localization);
-    //   return acc;
-    // }, {});
-
     const channelData = await this.prismaService.channel.findUnique({
       where: { id: channel.id },
       include: { youtube: true },
@@ -272,6 +269,7 @@ export class BullMQService {
       const resource = await this.prismaService.resource.findUnique({
         where: { id: task.resourceId },
         include: {
+          thumbnailGoogleDrive: true,
           localizations: {
             include: {
               localizedResourceFile: true,
@@ -284,56 +282,32 @@ export class BullMQService {
         throw new Error('Resource not found');
       }
 
-      // for (const localization of resource.localizations) {
+      const jobData: UpdateVideoLocalization = {
+        batchId,
+        batchTaskId: task.id,
+        videoId,
+        channel: {
+          id: channel.id,
+          channelId: channelData?.youtube?.youtubeId ?? '',
+          refreshToken: channelData?.youtube?.refreshToken ?? '',
+        },
+        resource: {
+          refreshToken: resource.thumbnailGoogleDrive?.refreshToken ?? '',
+          thumbnailDriveId: resource.thumbnailGoogleDrive?.driveId,
+          privacyStatus: resource.privacy ?? undefined
+        },
+        localizations: localizations.map((loc) => ({
+          resourceId: loc.resourceId,
+          title: loc.title ?? '',
+          description: loc.description ?? '',
+          language: loc.language,
+        })),
+      };
       jobs.push({
         name: 'processLocalization',
-        data: {
-          batchId,
-          batchTaskId: task.id,
-          videoId,
-          channel: {
-            id: channel.id,
-            channelId: channelData?.youtube?.youtubeId,
-            refreshToken: channelData?.youtube?.refreshToken,
-          },
-          localizations: localizations.map((loc) => ({
-            resourceId: loc.resourceId,
-            title: loc.title,
-            description: loc.description,
-            tags: loc.keywords?.split(',') ?? [],
-            language: loc.language,
-          })),
-        },
+        data: jobData,
       });
-      // }
     }
-
-    // Create a job for each videoId
-    // const jobs = Object.entries(localizationsByVideoId).map(
-    //   ([videoId, localizations]) => {
-    //     return {
-    //       name: 'processLocalization',
-    //       data: {
-    //         batchId,
-    //         batchTaskId: task.id,
-    //         videoId,
-    //         channel: {
-    //           id: channel.id,
-    //           channelId: channelData?.youtube?.youtubeId,
-    //           refreshToken: channelData?.youtube?.refreshToken,
-    //         },
-    //         localizations: localizations.map((loc) => ({
-    //           resourceId: loc.resourceId,
-    //           title: loc.title,
-    //           description: loc.description,
-    //           tags: loc.keywords?.split(',') ?? [],
-    //           language: loc.language,
-    //         })),
-    //       },
-    //     };
-    //   },
-    // );
-
     return await this.bucketQueue.addBulk(jobs);
   }
 
