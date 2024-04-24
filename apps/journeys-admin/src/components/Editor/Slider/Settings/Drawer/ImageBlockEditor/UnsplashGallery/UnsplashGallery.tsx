@@ -40,31 +40,23 @@ export const LIST_UNSPLASH_COLLECTION_PHOTOS = gql`
     }
   }
 `
-
-export const TRIGGER_UNSPLASH_DOWNLOAD = gql`
-  mutation TriggerUnsplashDownload($url: String!) {
-    triggerUnsplashDownload(url: $url)
-  }
-`
 export function UnsplashGallery(): ReactElement {
-  const [query] = useState<string>()
   const [page, setPage] = useState(1)
   const [collectionId] = useState('4924556')
 
   const { data: listData, fetchMore: fetchMoreList } =
     useQuery<ListUnsplashCollectionPhotos>(LIST_UNSPLASH_COLLECTION_PHOTOS, {
-      variables: { collectionId, page, perPage: 2 },
-      skip: query != null
+      variables: { collectionId, page, perPage: 3 }
     })
 
-  const nextPage = (): void => {
+  const nextPage = async (): Promise<void> => {
     console.log('next page')
     setPage(page + 1)
-    if (query == null) {
-      void fetchMoreList({
-        variables: { collectionId, page, perPage: 3 }
-      })
-    }
+
+    console.log(page)
+    await fetchMoreList({
+      variables: { collectionId, page, perPage: 3 }
+    })
   }
 
   const { t } = useTranslation('apps-journeys-admin')
@@ -72,6 +64,7 @@ export function UnsplashGallery(): ReactElement {
   // eslint-disable-next-line @typescript-eslint/explicit-function-return-type, @typescript-eslint/no-empty-function
   function a() {}
 
+  console.log(listData)
   return (
     <Stack sx={{ p: 6 }} data-testid="UnsplashGallery">
       <Stack sx={{ pt: 4, pb: 1 }}>
@@ -80,7 +73,7 @@ export function UnsplashGallery(): ReactElement {
         </Typography>
         <Typography variant="h6">{t('Featured Images')}</Typography>
       </Stack>
-      {query == null && listData !== undefined && (
+      {listData != null && (
         <UnsplashList
           gallery={listData.listUnsplashCollectionPhotos}
           onChange={a}
