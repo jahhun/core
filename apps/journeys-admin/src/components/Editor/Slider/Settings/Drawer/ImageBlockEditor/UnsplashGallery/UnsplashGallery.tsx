@@ -46,7 +46,6 @@ export const TRIGGER_UNSPLASH_DOWNLOAD = gql`
     triggerUnsplashDownload(url: $url)
   }
 `
-
 export function UnsplashGallery(): ReactElement {
   const [query] = useState<string>()
   const [page, setPage] = useState(1)
