@@ -5,7 +5,10 @@ import Typography from '@mui/material/Typography'
 import { useTranslation } from 'next-i18next'
 import { ReactElement, useState } from 'react'
 
-import { ListUnsplashCollectionPhotos } from '../../../../../../../../__generated__/ListUnsplashCollectionPhotos'
+import {
+  ListUnsplashCollectionPhotos,
+  ListUnsplashCollectionPhotos_listUnsplashCollectionPhotos
+} from '../../../../../../../../__generated__/ListUnsplashCollectionPhotos'
 
 import { UnsplashList } from './UnsplashList'
 
@@ -49,14 +52,19 @@ export function UnsplashGallery(): ReactElement {
       variables: { collectionId, page, perPage: 3 }
     })
 
+  const initialPage = async (): Promise<
+    ListUnsplashCollectionPhotos_listUnsplashCollectionPhotos | undefined
+  > => {
+    return listData?.listUnsplashCollectionPhotos
+  }
   const nextPage = async (): Promise<void> => {
     console.log('next page')
-    setPage(page + 1)
 
     console.log(page)
     await fetchMoreList({
-      variables: { collectionId, page, perPage: 3 }
+      variables: { collectionId, page: page + 1, perPage: 3 }
     })
+    setPage(page + 1)
   }
 
   const { t } = useTranslation('apps-journeys-admin')
@@ -73,12 +81,7 @@ export function UnsplashGallery(): ReactElement {
         </Typography>
         <Typography variant="h6">{t('Featured Images')}</Typography>
       </Stack>
-      {listData != null && (
-        <UnsplashList
-          gallery={listData.listUnsplashCollectionPhotos}
-          onChange={a}
-        />
-      )}
+      {listData != null && <UnsplashList gallery={initialPage} onChange={a} />}
 
       <LoadingButton variant="outlined" onClick={nextPage} size="medium">
         {t('Load More')}
