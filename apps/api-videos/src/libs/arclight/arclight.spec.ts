@@ -394,7 +394,12 @@ describe('arclight', () => {
     const video = {
       id: 'mediaComponentId',
       description: [
-        { languageId: '529', primary: true, value: 'longDescription' }
+        {
+          videoId: 'mediaComponentId',
+          languageId: '529',
+          primary: true,
+          value: 'longDescription'
+        }
       ],
       newDescription: [
         {
@@ -405,8 +410,7 @@ describe('arclight', () => {
         }
       ],
       image: 'mobileCinematicHigh',
-      imageAlt: [{ languageId: '529', primary: true, value: 'title' }],
-      newImageAlt: [
+      imageAlt: [
         {
           videoId: 'mediaComponentId',
           languageId: '529',
@@ -419,7 +423,12 @@ describe('arclight', () => {
       primaryLanguageId: '529',
       slug: 'title',
       snippet: [
-        { languageId: '529', primary: true, value: 'shortDescription' }
+        {
+          videoId: 'mediaComponentId',
+          languageId: '529',
+          primary: true,
+          value: 'shortDescription'
+        }
       ],
       newSnippet: [
         {
@@ -542,7 +551,9 @@ describe('arclight', () => {
           {
             languageId: '529',
             primary: true,
-            value: 'How can I know Jesus?'
+            order: 1,
+            value: 'How can I know Jesus?',
+            videoId: 'mediaComponentId'
           }
         ],
         newStudyQuestions: [
@@ -584,10 +595,11 @@ describe('arclight', () => {
         ],
         imageAlt: [
           {
+            videoId: 'mediaComponentId',
             languageId: '529',
-            primary: true,
             value:
-              'The Quick Brown Fox Jumps Over The Lazy Dog Many Times Over And Over Until It Gets Cut Off When Ove'
+              'The Quick Brown Fox Jumps Over The Lazy Dog Many Times Over And Over Until It Gets Cut Off When Ove',
+            primary: true
           }
         ],
         newImageAlt: [
@@ -781,7 +793,12 @@ describe('arclight', () => {
       )
       expect(video).toEqual({
         description: [
-          { languageId: '529', primary: true, value: 'longDescription' }
+          {
+            videoId: 'mediaComponentId',
+            languageId: '529',
+            primary: true,
+            value: 'longDescription'
+          }
         ],
         newDescription: [
           {
@@ -793,8 +810,7 @@ describe('arclight', () => {
         ],
         id: 'mediaComponentId',
         image: 'mobileCinematicHigh',
-        imageAlt: [{ languageId: '529', primary: true, value: 'title' }],
-        newImageAlt: [
+        imageAlt: [
           {
             videoId: 'mediaComponentId',
             languageId: '529',
@@ -807,7 +823,12 @@ describe('arclight', () => {
         primaryLanguageId: '529',
         slug: 'title',
         snippet: [
-          { languageId: '529', primary: true, value: 'shortDescription' }
+          {
+            videoId: 'mediaComponentId',
+            languageId: '529',
+            primary: true,
+            value: 'shortDescription'
+          }
         ],
         newSnippet: [
           {

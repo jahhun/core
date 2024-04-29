@@ -31,6 +31,8 @@ enum VideoLabel {
   segment
   series
   shortFilm
+  trailer
+  behindTheScenes
 }
 
 model Video {
@@ -38,15 +40,11 @@ model Video {
   label             VideoLabel
   primaryLanguageId String
   title             VideoTitle[]
-  snippet           Json[]
-  newSnippet        VideoSnippet[]
-  description       Json[]
-  newDescription    VideoDescription[]
-  studyQuestions    Json[]
-  newStudyQuestions VideoStudyQuestion[]
+  snippet           VideoSnippet[]
+  description       VideoDescription[]
+  studyQuestions    VideoStudyQuestion[]
   image             String?
-  imageAlt          Json[]
-  newImageAlt       VideoImageAlt[]
+  imageAlt          VideoImageAlt[]
   slug              String?              @unique
   noIndex           Boolean?
   childIds          String[] // needed for child sort order
@@ -166,6 +164,7 @@ model VideoStudyQuestion {
   languageId String
   order      Int
   primary    Boolean
+  crowdInId  String?
   videoId    String?
   video      Video?  @relation(fields: [videoId], references: [id], onDelete: Cascade)
 
